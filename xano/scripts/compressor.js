@@ -1,4 +1,4 @@
-return await (async () => {
+(async () => {
   // ---- INPUT (hard coded or replace with $input.xxx) ----
   const BASE64_INPUT = "$$PLACEHOLDER$$";
 
@@ -19,15 +19,15 @@ return await (async () => {
     return btoa(bin);
   }
 
-  // ---- Compress using gzip (best general ratio) ----
+  // ---- Compress (gzip = best ratio, zero deps) ----
   async function compress(uint8) {
     const cs = new CompressionStream("gzip");
     const writer = cs.writable.getWriter();
     await writer.write(uint8);
     await writer.close();
 
-    const compressedBuffer = await new Response(cs.readable).arrayBuffer();
-    return new Uint8Array(compressedBuffer);
+    const buffer = await new Response(cs.readable).arrayBuffer();
+    return new Uint8Array(buffer);
   }
 
   // ---- Pipeline ----
@@ -35,7 +35,7 @@ return await (async () => {
   const compressed = await compress(decoded);
   const compressedBase64 = uint8ArrayToBase64(compressed);
 
-  // ---- JSON-safe output ----
+  // ---- FINAL RESULT ----
   return {
     encoding: "base64",
     compression: "gzip",
