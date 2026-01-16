@@ -35,12 +35,12 @@ const compressed = await gzipCompress(decoded);
 const compressedBase64 = uint8ArrayToBase64(compressed);
 
 // ---- Output (Base64-encoded JSON-safe blob) ----
-const return = {
+const output = {
   encoding: "base64",
   compression: "gzip",
   data: compressedBase64,
   original_size: decoded.length,
   compressed_size: compressed.length
 };
-
-return
+console.log(output);
+output
