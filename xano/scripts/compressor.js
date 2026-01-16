@@ -1,22 +1,35 @@
-(() => {
+(async () => {
   const BASE64_INPUT = "$$PLACEHOLDER$$";
 
-  const bin = atob(BASE64_INPUT);
-  const bytes = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) {
-    bytes[i] = bin.charCodeAt(i);
+  function b64ToU8(b64) {
+    const s = atob(b64);
+    const u = new Uint8Array(s.length);
+    for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i);
+    return u;
   }
 
-  // Optional light log (sizes only)
-  console.log("decoded_bytes:", bytes.length);
+  function u8ToB64(u8) {
+    let s = "";
+    for (const b of u8) s += String.fromCharCode(b);
+    return btoa(s);
+  }
 
-  let out = "";
-  for (const b of bytes) out += String.fromCharCode(b);
+  const input = b64ToU8(BASE64_INPUT);
+  console.log("input_bytes:", input.length);
+
+  const cs = new CompressionStream("gzip");
+  cs.writable.getWriter().write(input).then(w => w?.close?.());
+
+  const compressed = new Uint8Array(
+    await new Response(cs.readable).arrayBuffer()
+  );
+
+  console.log("compressed_bytes:", compressed.length);
 
   return {
     encoding: "base64",
-    compression: "none",
-    size: bytes.length,
-    data: btoa(out)
+    compression: "gzip",
+    ratio: (compressed.length / input.length).toFixed(3),
+    data: u8ToB64(compressed)
   };
 })();
