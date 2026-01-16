@@ -1,4 +1,6 @@
-(async () => {
+// (async () => {
+
+console.log("START");
   // ---- INPUT (hard coded or replace with $input.xxx) ----
   const BASE64_INPUT = "$$PLACEHOLDER$$";
 
@@ -51,5 +53,9 @@ console.log({
     original_size: decoded.length,
     compressed_size: compressed.length
   });
+
+
+console.log("END");
+
   out // trying to youtput anything
-})();
+// })();
