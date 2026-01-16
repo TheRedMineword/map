@@ -36,11 +36,20 @@
   const compressedBase64 = uint8ArrayToBase64(compressed);
 
   // ---- FINAL RESULT ----
-  return {
+ const out = {
     encoding: "base64",
     compression: "gzip",
     data: compressedBase64,
     original_size: decoded.length,
     compressed_size: compressed.length
   };
+
+console.log({
+    encoding: "base64",
+    compression: "gzip",
+    data: compressedBase64,
+    original_size: decoded.length,
+    compressed_size: compressed.length
+  });
+  out // trying to youtput anything
 })();
