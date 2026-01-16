@@ -1,35 +1,44 @@
-(async () => {
-  const BASE64_INPUT = "$$PLACEHOLDER$$";
+const { Buffer } = await import("npm:buffer");
+const zlib = await import("node:zlib");
 
-  function b64ToU8(b64) {
-    const s = atob(b64);
-    const u = new Uint8Array(s.length);
-    for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i);
-    return u;
+try {
+  // 1. Validate Input
+  if (typeof $var.target !== 'string') {
+    throw new Error("$var.target must be a Base64 encoded string.");
   }
 
-  function u8ToB64(u8) {
-    let s = "";
-    for (const b of u8) s += String.fromCharCode(b);
-    return btoa(s);
-  }
+  // 2. Decode the Base64 input string into a binary Buffer
+  // This handles JSON, text, or raw binary data encoded in the input string.
+  const decodedBuffer = Buffer.from($var.target, 'base64');
+  const inputLength = decodedBuffer.length;
 
-  const input = b64ToU8(BASE64_INPUT);
-  console.log("input_bytes:", input.length);
+  // 3. Compress the data
+  // We use Gzip with Z_BEST_COMPRESSION (Level 9) to achieve the smallest file size
+  // compatible with standard Gzip tools.
+  const compressedBuffer = zlib.gzipSync(decodedBuffer, {
+    level: zlib.constants.Z_BEST_COMPRESSION
+  });
+  const outputLength = compressedBuffer.length;
 
-  const cs = new CompressionStream("gzip");
-  cs.writable.getWriter().write(input).then(w => w?.close?.());
+  // 4. Encode the compressed binary back to Base64
+  // JSON cannot natively hold raw binary data, so Base64 is required to return it safely.
+  const outputBase64 = compressedBuffer.toString('base64');
 
-  const compressed = new Uint8Array(
-    await new Response(cs.readable).arrayBuffer()
-  );
-
-  console.log("compressed_bytes:", compressed.length);
-
+  // 5. Return the result
   return {
-    encoding: "base64",
-    compression: "gzip",
-    ratio: (compressed.length / input.length).toFixed(3),
-    data: u8ToB64(compressed)
+    success: true,
+    compressed_data: outputBase64,
+    stats: {
+      input_length_bytes: inputLength,
+      output_length_bytes: outputLength,
+      compression_ratio: (100 * (1 - outputLength / inputLength)).toFixed(2) + "%",
+      method: "gzip"
+    }
   };
-})();
+
+} catch (e) {
+  return {
+    success: false,
+    error: e.message
+  };
+}
