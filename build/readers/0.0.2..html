@@ -17,8 +17,9 @@
 </style>
 </head>
 <body>
-<pre id="log" style="white-space: pre-wrap; max-height: 500px; overflow-y: auto; background:#111; color:#0f0; padding:10px;"></pre>
+<pre id="log" style="white-space: pre-wrap; background:#111; color:#0f0; padding:10px;"></pre>
 <script>
+  //  max-height: 500px; overflow-y: auto;
 (async function main() {
   const BASE = "https://theredmineword.github.io/map/build/";
   const logEl = document.getElementById("log");
@@ -107,6 +108,7 @@
   }
 
   log("[INFO] Decompressed size:", data.length);
+  log(data);
 
   const text = new TextDecoder("latin1").decode(data);
 
@@ -135,6 +137,8 @@
       const compressed = /Compressed=1/.test(meta);
 
       let payload = new Uint8Array([...raw].map(c => c.charCodeAt(0)));
+      log("payload");
+      log(payload);
 
       if (compressed) {
         log("[INFO] Payload compressed → attempting decompression");
@@ -143,6 +147,8 @@
           err("[ERROR] Payload decompression failed → skipping record");
           return;
         }
+        log("out");
+        log(out);
         payload = out;
       }
 
