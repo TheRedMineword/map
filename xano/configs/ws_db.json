@@ -2,7 +2,7 @@
   "results": "https://ws.mentalisit.myds.me/matches?limit=$$limit$$&page=$$loopcount$$",
   "corporations": "https://ws.mentalisit.myds.me/corps",
   "chunks": {
-    "limit": 99999,
+    "limit": 3,
     "size": 50
   },
   "mapcore": "e30="
