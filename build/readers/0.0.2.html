@@ -147,7 +147,9 @@
       }
 
       log("[BYTES] final size:", payload.length);
+      log("[BYTES] raw:", payload);
 
+      
       if (/JAVASCRIPT_SOURCE/.test(meta)) {
         const src = new TextDecoder().decode(payload);
         log("[EXEC] JavaScript source loaded");
