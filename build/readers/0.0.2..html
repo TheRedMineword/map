@@ -138,7 +138,8 @@
       if (metaEnd === -1) return;
 
       const meta = block.slice(0, metaEnd).trim();
-      const raw = block.slice(metaEnd + 18);
+      // const raw = block.slice(metaEnd + 18);
+const raw = block.slice(metaEnd + 0);
 
       log(`\n[MBDB] Record #${idx}`);
       log("[META]\n" + meta);
