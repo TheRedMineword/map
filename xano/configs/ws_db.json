@@ -1,1 +1,9 @@
-{"results": "https://ws.mentalisit.myds.me/matches?limit=$$limit$$&page=$$loopcount$$", "corporations": "https://ws.mentalisit.myds.me/corps"}
+{
+  "results": "https://ws.mentalisit.myds.me/matches?limit=$$limit$$&page=$$loopcount$$",
+  "corporations": "https://ws.mentalisit.myds.me/corps",
+  "chunks": {
+    "limit": 1,
+    "size": 25
+  },
+  "mapcore": "e30="
+}
