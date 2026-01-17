@@ -132,7 +132,7 @@
       if (end === -1) return;
 
       const block = text.slice(pos + START.length, end);
-      const metaEnd = block.indexOf("#$#$====== 'BYTES'");
+      const metaEnd = block.indexOf("#$#$====== 'BYTES'\n");
       if (metaEnd === -1) return;
 
       const meta = block.slice(0, metaEnd).trim();
