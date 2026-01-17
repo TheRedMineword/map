@@ -17,12 +17,28 @@
 </style>
 </head>
 <body>
-<pre id="log"></pre>
+<pre id="log" style="white-space: pre-wrap; max-height: 500px; overflow-y: auto; background:#111; color:#0f0; padding:10px;"></pre>
 <script>
 (async function main() {
   const BASE = "https://theredmineword.github.io/map/build/";
-  const log = (...a) => console.log(...a);
-  const err = (...a) => console.error(...a);
+  const logEl = document.getElementById("log");
+
+  const appendLog = (msg) => {
+    if (!logEl) return;
+    logEl.textContent += msg + "\n";
+    logEl.scrollTop = logEl.scrollHeight; // auto scroll
+  };
+
+  // Custom log functions
+  const log = (...args) => {
+    console.log(...args);
+    appendLog(args.map(a => (typeof a === "object" ? JSON.stringify(a, null, 2) : a)).join(" "));
+  };
+
+  const err = (...args) => {
+    console.error(...args);
+    appendLog(args.map(a => (typeof a === "object" ? JSON.stringify(a, null, 2) : a)).join(" "));
+  };
 
   function u8(hex) {
     return [...hex].map(c => c.charCodeAt(0));
