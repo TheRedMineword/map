@@ -133,6 +133,8 @@
 
       const block = text.slice(pos + START.length, end);
       const metaEnd = block.indexOf("#$#$====== 'BYTES'\n");
+      log("metaEnd");
+      log(metaEnd);
       if (metaEnd === -1) return;
 
       const meta = block.slice(0, metaEnd).trim();
