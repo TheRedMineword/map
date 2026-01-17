@@ -48,7 +48,7 @@ console.log("filtered:", filteredResults.length);
 console.log("issues:", issueCount);
 
 // ---- final output ----
-output = {
+const output = {
   results: filteredResults,
   resultsall: resultsall,
   txt: {
@@ -57,3 +57,4 @@ output = {
     issuec: issueCount
   }
 };
+output
