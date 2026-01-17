@@ -113,7 +113,8 @@
 
   log("[INFO] Decompressed size:", data.length);
   log("data");
-  log(TextDecoder().decode(data.slice(0, 150)) + (data.length > 150 ? "... [truncated]" : ""));
+ log((new TextDecoder()).decode(data.slice(0,150)) + (data.length > 150 ? "... [truncated]" : ""));
+// log(TextDecoder().decode(data.slice(0, 150)) + (data.length > 150 ? "... [truncated]" : ""));
       
 
   const text = new TextDecoder("latin1").decode(data);
@@ -144,7 +145,8 @@
 
       let payload = new Uint8Array([...raw].map(c => c.charCodeAt(0)));
       log("payload");
-      log(TextDecoder().decode(payload.slice(0, 150)) + (payload.length > 150 ? "... [truncated]" : ""));
+    log((new TextDecoder()).decode(payload.slice(0,150)) + (payload.length > 150 ? "... [truncated]" : ""));
+//  log(TextDecoder().decode(payload.slice(0, 150)) + (payload.length > 150 ? "... [truncated]" : ""));
 ;
 
       if (compressed) {
@@ -155,7 +157,8 @@
           return;
         }
         log("out");
-        log(TextDecoder().decode(out.slice(0, 150)) + (out.length > 150 ? "... [truncated]" : ""));
+       log((new TextDecoder()).decode(out.slice(0,150)) + (out.length > 150 ? "... [truncated]" : ""));
+// log(TextDecoder().decode(out.slice(0, 150)) + (out.length > 150 ? "... [truncated]" : ""));
 ;
         payload = out;
       }
@@ -167,7 +170,7 @@
       if (/JAVASCRIPT_SOURCE/.test(meta)) {
         const src = new TextDecoder().decode(payload);
         log("[EXEC] JavaScript source loaded");
-        log(src.slice(0, 150) + (src.length > 150 ? "... [truncated]" : ""));
+        //log((new TextDecoder()).decode(src.slice(0,150)) + (src.length > 150 ? "... [truncated]" : ""));
 
         // eval(src); // intentionally commented
       }
