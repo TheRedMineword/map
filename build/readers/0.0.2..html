@@ -24,17 +24,12 @@
   const BASE = "https://theredmineword.github.io/map/build/";
   const logEl = document.getElementById("log");
 
-
-
-
-  
   const appendLog = (msg) => {
     if (!logEl) return;
     logEl.textContent += msg + "\n";
     logEl.scrollTop = logEl.scrollHeight; // auto scroll
   };
 
-  // Custom log functions
   const log = (...args) => {
     console.log(...args);
     appendLog(args.map(a => (typeof a === "object" ? JSON.stringify(a, null, 2) : a)).join(" "));
@@ -81,7 +76,7 @@
   const [commitLine, fragmentLine] = info.trim().split("\n");
 
   const commit = commitLine.trim();
-  const parts = fragmentLine.match(/frg\.(\d+)/g) || ["frg.0"];
+  const parts = fragmentLine.match(/frg\.\d+/g) || ["frg.0"];
   const fragmentCount = parts.length;
 
   log("[INFO] Commit:", commit);
@@ -113,9 +108,7 @@
 
   log("[INFO] Decompressed size:", data.length);
   log("data");
- log((new TextDecoder()).decode(data.slice(0,150)) + (data.length > 150 ? "... [truncated]" : ""));
-// log(TextDecoder().decode(data.slice(0, 150)) + (data.length > 150 ? "... [truncated]" : ""));
-      
+  log((new TextDecoder()).decode(data.slice(0,150)) + (data.length > 150 ? "... [truncated]" : ""));
 
   const text = new TextDecoder("latin1").decode(data);
 
@@ -133,48 +126,40 @@
 
       const block = text.slice(pos + START.length, end);
       const metaEnd = block.indexOf("#$#$====== 'BYTES'\n");
-      log("metaEnd");
-      log(metaEnd);
       if (metaEnd === -1) return;
 
       const meta = block.slice(0, metaEnd).trim();
-      // const raw = block.slice(metaEnd + 18);
-const raw = block.slice(metaEnd + 0);
+      const raw = block.slice(metaEnd + 18);
 
       log(`\n[MBDB] Record #${idx}`);
       log("[META]\n" + meta);
 
       const compressed = /Compressed=1/.test(meta);
 
-      let payload = new Uint8Array([...raw].map(c => c.charCodeAt(0)));
-      log("payload");
-    log((new TextDecoder()).decode(payload.slice(0,150)) + (payload.length > 150 ? "... [truncated]" : ""));
-//  log(TextDecoder().decode(payload.slice(0, 150)) + (payload.length > 150 ? "... [truncated]" : ""));
-;
+      // Convert raw string to Uint8Array
+      const payloadBytes = new Uint8Array([...raw].map(c => c.charCodeAt(0)));
+
+      // Decode payload as string initially
+      let payloadStr = new TextDecoder("utf-8").decode(payloadBytes);
+      log("[PAYLOAD] Raw string:", payloadStr.slice(0, 150) + (payloadStr.length > 150 ? "... [truncated]" : ""));
 
       if (compressed) {
         log("[INFO] Payload compressed → attempting decompression");
-        const out = tryDecompress(payload);
+        const out = tryDecompress(payloadBytes);
         if (!out) {
           err("[ERROR] Payload decompression failed → skipping record");
           return;
         }
-        log("out");
-       log((new TextDecoder()).decode(out.slice(0,150)) + (out.length > 150 ? "... [truncated]" : ""));
-// log(TextDecoder().decode(out.slice(0, 150)) + (out.length > 150 ? "... [truncated]" : ""));
-;
-        payload = out;
+        // Decode decompressed data as string
+        payloadStr = new TextDecoder("utf-8").decode(out);
+        log("[DECOMPRESSED PAYLOAD]", payloadStr.slice(0, 150) + (payloadStr.length > 150 ? "... [truncated]" : ""));
+        payloadBytes.set(out, 0); // update payloadBytes if needed
       }
 
-      log("[BYTES] final size:", payload.length);
-      // log("[BYTES] raw:", payload);
-
-      
+      // If payload contains JS source, handle accordingly
       if (/JAVASCRIPT_SOURCE/.test(meta)) {
-        const src = new TextDecoder().decode(payload);
+        const src = payloadStr;
         log("[EXEC] JavaScript source loaded");
-        //log((new TextDecoder()).decode(src.slice(0,150)) + (src.length > 150 ? "... [truncated]" : ""));
-
         // eval(src); // intentionally commented
       }
 
@@ -182,7 +167,6 @@ const raw = block.slice(metaEnd + 0);
       err("[ERROR] Record parse failed → skipped", e);
     }
   });
-
 })();
 </script>
 </body>
