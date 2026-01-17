@@ -24,6 +24,10 @@
   const BASE = "https://theredmineword.github.io/map/build/";
   const logEl = document.getElementById("log");
 
+
+
+
+  
   const appendLog = (msg) => {
     if (!logEl) return;
     logEl.textContent += msg + "\n";
@@ -109,7 +113,7 @@
 
   log("[INFO] Decompressed size:", data.length);
   log("data");
-  log(data.slice(0, 150) + (data.length > 150 ? "... [truncated]" : ""));
+  log(TextDecoder().decode(data.slice(0, 150)) + (data.length > 150 ? "... [truncated]" : ""));
       
 
   const text = new TextDecoder("latin1").decode(data);
@@ -140,7 +144,7 @@
 
       let payload = new Uint8Array([...raw].map(c => c.charCodeAt(0)));
       log("payload");
-      log(payload.slice(0, 150) + (payload.length > 150 ? "... [truncated]" : ""));
+      log(TextDecoder().decode(payload.slice(0, 150)) + (payload.length > 150 ? "... [truncated]" : ""));
 ;
 
       if (compressed) {
@@ -151,7 +155,7 @@
           return;
         }
         log("out");
-        log(out.slice(0, 150) + (out.length > 150 ? "... [truncated]" : ""));
+        log(TextDecoder().decode(out.slice(0, 150)) + (out.length > 150 ? "... [truncated]" : ""));
 ;
         payload = out;
       }
