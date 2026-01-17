@@ -6,7 +6,7 @@
    INPUT (Base64)
    ========================= */
 
-var base64 = $$PLACEHOLDER$$;
+var base64 = "$$PLACEHOLDER$$";
 
 /* Decode Base64 → JSON */
 var jsonStr = atob(base64);
