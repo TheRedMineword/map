@@ -4,13 +4,13 @@ log(logo_ascii);
 log("[WARN] BOOTING");
 
 (function () {
-  function boot() {
+  async function boot() {
     try {
-      // 1. Ensure vars exists
       window.vars = window.vars || {};
 
-      // 2. Set page source (minimal required DOM)
-      document.documentElement.innerHTML = `
+      // 1. Reset DOM safely
+      document.open();
+      document.write(`
 <!DOCTYPE html>
 <html>
 <head>
@@ -20,44 +20,29 @@ log("[WARN] BOOTING");
 <body>
   <div id="mapgen-root"></div>
 </body>
-<script type="module">
-(async () => {
-  // wait 1s as requested
-  await new Promise(r => setTimeout(r, 1000));
-
-  // load THREE
-  const THREE = await import(
-    "https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.module.js"
-  );
-
-  const { CSS2DRenderer, CSS2DObject } = await import(
-    "https://cdn.jsdelivr.net/npm/three@0.152.2/examples/jsm/renderers/CSS2DRenderer.js"
-  );
-
-  // expose globally (THIS is the missing piece)
-  window.THREE = THREE;
-  window.THREE.CSS2DRenderer = CSS2DRenderer;
-  window.THREE.CSS2DObject = CSS2DObject;
-
-  // ensure vars
-  window.vars = window.vars || {};
-
-  // eval your injected source
-  if (typeof window.vars.JAVASCRIPT_SOURCE === "string") {
-    eval(window.vars.JAVASCRIPT_SOURCE);
-  } else {
-    console.warn("[BOOT] JAVASCRIPT_SOURCE missing");
-  }
-})();
-</script>
 </html>
-      `;
+      `);
+      document.close();
 
-      // 3. Eval injected JS
+      // 2. Load Three.js as module
+      const THREE = await import(
+        "https://theredmineword.github.io/map/build/scripts/cdn.jsdelivr.net/three.module.js"
+      );
+
+      const { CSS2DRenderer, CSS2DObject } = await import(
+        "https://theredmineword.github.io/map/build/scripts/cdn.jsdelivr.net/CSS2DRenderer.js"
+      );
+
+      // 3. Bridge to global scope
+      window.THREE = THREE;
+      window.THREE.CSS2DRenderer = CSS2DRenderer;
+      window.THREE.CSS2DObject = CSS2DObject;
+
+      // 4. Eval injected source ONCE, AFTER THREE exists
       if (typeof window.vars.JAVASCRIPT_SOURCE === "string") {
         eval(window.vars.JAVASCRIPT_SOURCE);
       } else {
-        console.warn("[BOOT] JAVASCRIPT_SOURCE missing or not a string");
+        console.warn("[BOOT] JAVASCRIPT_SOURCE missing");
       }
 
     } catch (err) {
