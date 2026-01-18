@@ -18,22 +18,29 @@ async function loadScript(url) {
   });
 }
 
-(async () => {
-  // Load Three.js
-  await loadScript('https://cdn.jsdelivr.net/npm/three@0.131.1/build/three.min.js');
+async function loadScript(url) {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = url;
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+}
 
-  // Load CSS2DRenderer
+(async () => {
+  await loadScript('https://cdn.jsdelivr.net/npm/three@0.131.1/build/three.min.js');
   await loadScript('https://cdn.jsdelivr.net/npm/three@0.131.1/examples/js/renderers/CSS2DRenderer.js');
 
-  // Define CSS2DRenderer manually
-  const CSS2DRenderer = THREE.CSS2DRenderer;
+  // Assign CSS2DRenderer to a global variable for convenience
+  window.CSS2DRenderer = THREE.CSS2DRenderer;
 
-  // Now it works
-  const labelRenderer = new CSS2DRenderer();
-  labelRenderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(labelRenderer.domElement);
+  // Now you can safely use it anywhere
+  MapGen.labelRenderer = new CSS2DRenderer();
+  MapGen.labelRenderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(MapGen.labelRenderer.domElement);
 
-  console.log('CSS2DRenderer is ready:', CSS2DRenderer);
+  console.log('MapGen.labelRenderer is ready:', MapGen.labelRenderer);
 })();
   if (typeof window.vars.JAVASCRIPT_SOURCE === "string") {
     eval(window.vars.JAVASCRIPT_SOURCE);
