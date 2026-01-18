@@ -29,7 +29,7 @@ MapGen.init = function () {
   MapGen.camera.position.z = 1000;
 
   // CSS2D renderer
-  MapGen.labelRenderer = new THREE.CSS2DRenderer();
+  MapGen.labelRenderer = new CSS2DRenderer();
   MapGen.labelRenderer.setSize(window.innerWidth, window.innerHeight);
   MapGen.labelRenderer.domElement.style.position = "absolute";
   MapGen.labelRenderer.domElement.style.top = "0";
