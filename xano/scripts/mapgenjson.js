@@ -19,7 +19,7 @@ var matches = input && input.matches ? input.matches : [];
    ========================= */
 
 var CORE_PARENT_ID = "core";
-var ICON_URL = "https://example.com/icons/match.png";
+var ICON_URL = "https://theredmineword.github.io/map/img_src/white_start_alive.png";
 
 var BASE_Y = 0;
 var Y_SCALE = 6;        // seconds → distance
@@ -84,7 +84,7 @@ for (var i = 0; i < matches.length; i++) {
     meta: {
       id: "match--" + m.MatchId,
       displayName:
-        "##" + slug + "##\n" +
+        "" + slug + "\n" +
         m.Corporation1Name + " vs " + m.Corporation2Name,
       icon: ICON_URL
     },
