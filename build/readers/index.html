@@ -29,8 +29,11 @@ window.MBDB = { ready:false };
 
 const logEl = document.getElementById("log");
 const log = (...a) => {
-  logEl.textContent += a.join(" ") + "\n";
+  // logEl.textContent += a.join(" ") + "\n";
+logEl.textContent = a.join(" ") + "\n" + logEl.textContent;
+
   logEl.scrollTop = logEl.scrollHeight;
+
 };
 const err = (...a) => log("[ERROR]", ...a);
 
