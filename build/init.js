@@ -3,33 +3,35 @@ const logo_ascii = "          _____                    _____                    
 log(logo_ascii);
 log("[WARN] BOOTING");
 
-// 1. Create and insert importmap script
-const importMapScript = document.createElement('script');
-importMapScript.type = 'importmap';
-importMapScript.textContent = JSON.stringify({
-  imports: {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.module.js",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.152.2/examples/jsm/"
-  }
-});
-document.body.appendChild(importMapScript);
 
-// 2. Create and insert the module script with your code
-const moduleScript = document.createElement('script');
-moduleScript.type = 'module';
 
-const moduleCode = `
-import * as THREE from 'three';
-import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
-`;
 
-moduleScript.textContent = moduleCode;
-document.body.appendChild(moduleScript);
 
- // 5. Run your custom source if present
-    if (typeof window.vars.JAVASCRIPT_SOURCE === "string") {
-      new Function(window.vars.JAVASCRIPT_SOURCE)();
-    } else {
-      console.warn("[BOOT] JAVASCRIPT_SOURCE missing");
+// 1️⃣ Dynamically load Three.js module and CSS2DRenderer
+(async function loadThreeAndCSS2D() {
+  // Load Three.js
+  const THREEModule = await import('https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.module.js');
+  
+  // Load CSS2DRenderer
+  const CSS2DModule = await import('https://cdn.jsdelivr.net/npm/three@0.152.2/examples/jsm/renderers/CSS2DRenderer.js');
+  
+  // Expose globally so your old code can access it
+  window.THREE = THREEModule;
+  window.CSS2DRenderer = CSS2DModule.CSS2DRenderer;
+  window.CSS2DObject = CSS2DModule.CSS2DObject;
+
+  console.log('[BOOT] THREE, CSS2DRenderer, CSS2DObject loaded globally');
+
+  // Now you can safely run your MapGen code
+  if (typeof window.vars.JAVASCRIPT_SOURCE === "string") {
+    // Use eval so it has access to global THREE
+    try {
+      eval(window.vars.JAVASCRIPT_SOURCE);
+    } catch (err) {
+      console.error('[BOOT] Error running JAVASCRIPT_SOURCE', err);
     }
+  } else {
+    console.warn('[BOOT] JAVASCRIPT_SOURCE missing');
+  }
+})();
 
