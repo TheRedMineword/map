@@ -7,23 +7,34 @@ log("[WARN] BOOTING");
 
 
 
-function loadScript(url) {
+
+async function loadScript(url) {
   return new Promise((resolve, reject) => {
-    const s = document.createElement('script');
-    s.src = url;
-    s.onload = resolve;
-    s.onerror = reject;
-    document.head.appendChild(s);
+    const script = document.createElement('script');
+    script.src = url;
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
   });
 }
 
 (async () => {
+  // Load Three.js
   await loadScript('https://cdn.jsdelivr.net/npm/three@0.131.1/build/three.min.js');
+
+  // Load CSS2DRenderer
   await loadScript('https://cdn.jsdelivr.net/npm/three@0.131.1/examples/js/renderers/CSS2DRenderer.js');
 
-  console.log('[BOOT] THREE & CSS2DRenderer loaded globally');
+  // Define CSS2DRenderer manually
+  const CSS2DRenderer = THREE.CSS2DRenderer;
 
+  // Now it works
+  const labelRenderer = new CSS2DRenderer();
+  labelRenderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(labelRenderer.domElement);
+
+  console.log('CSS2DRenderer is ready:', CSS2DRenderer);
+})();
   if (typeof window.vars.JAVASCRIPT_SOURCE === "string") {
     eval(window.vars.JAVASCRIPT_SOURCE);
   }
-})();
