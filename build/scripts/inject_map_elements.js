@@ -7,7 +7,9 @@ MapGen.pushBlob = function (blob, chunkSize = 50) {
     const end = Math.min(i + chunkSize, blob.length);
     for (; i < end; i++) {
       const decoded = JSON.parse(blob[i]);
-      decoded.forEach(MapGen.push);
+const items = Array.isArray(decoded) ? decoded : [decoded];
+items.forEach(MapGen.push);
+
     }
 
     if (i < blob.length) {
