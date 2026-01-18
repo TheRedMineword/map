@@ -87,7 +87,7 @@ MapGen._createObject = function (obj) {
     }
   });
 
-  const labelObj = new THREE.CSS2DObject(el);
+  const labelObj = new CSS2DObject(el);
   wrapper.add(labelObj);
 
   return wrapper;
