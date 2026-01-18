@@ -20,6 +20,36 @@ log("[WARN] BOOTING");
 <body>
   <div id="mapgen-root"></div>
 </body>
+<script type="module">
+(async () => {
+  // wait 1s as requested
+  await new Promise(r => setTimeout(r, 1000));
+
+  // load THREE
+  const THREE = await import(
+    "https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.module.js"
+  );
+
+  const { CSS2DRenderer, CSS2DObject } = await import(
+    "https://cdn.jsdelivr.net/npm/three@0.152.2/examples/jsm/renderers/CSS2DRenderer.js"
+  );
+
+  // expose globally (THIS is the missing piece)
+  window.THREE = THREE;
+  window.THREE.CSS2DRenderer = CSS2DRenderer;
+  window.THREE.CSS2DObject = CSS2DObject;
+
+  // ensure vars
+  window.vars = window.vars || {};
+
+  // eval your injected source
+  if (typeof window.vars.JAVASCRIPT_SOURCE === "string") {
+    eval(window.vars.JAVASCRIPT_SOURCE);
+  } else {
+    console.warn("[BOOT] JAVASCRIPT_SOURCE missing");
+  }
+})();
+</script>
 </html>
       `;
 
