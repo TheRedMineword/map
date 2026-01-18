@@ -33,8 +33,11 @@ async function loadScript(url) {
   await loadScript('https://cdn.jsdelivr.net/npm/three@0.131.1/examples/js/renderers/CSS2DRenderer.js');
 
   // Assign CSS2DRenderer to a global variable for convenience
-  window.CSS2DRenderer = THREE.CSS2DRenderer;
-
+   window.CSS2DRenderer = THREE.CSS2DRenderer;
+  window.CSS2DObject   = THREE.CSS2DObject;
+  if (typeof window.vars.JAVASCRIPT_SOURCE === "string") {
+    eval(window.vars.JAVASCRIPT_SOURCE);
+  }
   // Now you can safely use it anywhere
   MapGen.labelRenderer = new CSS2DRenderer();
   MapGen.labelRenderer.setSize(window.innerWidth, window.innerHeight);
@@ -42,6 +45,3 @@ async function loadScript(url) {
 
   console.log('MapGen.labelRenderer is ready:', MapGen.labelRenderer);
 })();
-  if (typeof window.vars.JAVASCRIPT_SOURCE === "string") {
-    eval(window.vars.JAVASCRIPT_SOURCE);
-  }
