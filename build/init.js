@@ -7,31 +7,34 @@ log("[WARN] BOOTING");
 
 
 
-// 1️⃣ Dynamically load Three.js module and CSS2DRenderer
-(async function loadThreeAndCSS2D() {
-  // Load Three.js
-  const THREEModule = await import('https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.module.js');
-  
-  // Load CSS2DRenderer
-  const CSS2DModule = await import('https://cdn.jsdelivr.net/npm/three@0.152.2/examples/jsm/renderers/CSS2DRenderer.js');
-  
-  // Expose globally so your old code can access it
-  window.THREE = THREEModule;
-  window.CSS2DRenderer = CSS2DModule.CSS2DRenderer;
-  window.CSS2DObject = CSS2DModule.CSS2DObject;
+function loadScript(url) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = url;
+    s.onload = resolve;
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
 
-  console.log('[BOOT] THREE, CSS2DRenderer, CSS2DObject loaded globally');
+(async () => {
+  try {
+    // 1️⃣ Load Three.js first
+    await loadScript('../scripts/cdn.jsdelivr.net/three.min.js');
 
-  // Now you can safely run your MapGen code
-  if (typeof window.vars.JAVASCRIPT_SOURCE === "string") {
-    // Use eval so it has access to global THREE
-    try {
+    // 2️⃣ Load CSS2DRenderer second
+    await loadScript('../scripts/cdn.jsdelivr.net/CSS2DRenderer.js');
+
+    console.log('[BOOT] THREE & CSS2DRenderer loaded globally');
+
+    // 3️⃣ Now run your MapGen code safely — AFTER scripts are loaded
+    if (typeof window.vars.JAVASCRIPT_SOURCE === "string") {
       eval(window.vars.JAVASCRIPT_SOURCE);
-    } catch (err) {
-      console.error('[BOOT] Error running JAVASCRIPT_SOURCE', err);
+    } else {
+      console.warn('[BOOT] JAVASCRIPT_SOURCE missing');
     }
-  } else {
-    console.warn('[BOOT] JAVASCRIPT_SOURCE missing');
+
+  } catch (err) {
+    console.error('[BOOT] Error loading scripts', err);
   }
 })();
-
