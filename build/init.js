@@ -18,23 +18,12 @@ function loadScript(url) {
 }
 
 (async () => {
-  try {
-    // 1️⃣ Load Three.js first
-    await loadScript('../scripts/cdn.jsdelivr.net/three.min.js');
+  await loadScript('https://cdn.jsdelivr.net/npm/three@0.131.1/build/three.min.js');
+  await loadScript('https://cdn.jsdelivr.net/npm/three@0.131.1/examples/js/renderers/CSS2DRenderer.js');
 
-    // 2️⃣ Load CSS2DRenderer second
-    await loadScript('../scripts/cdn.jsdelivr.net/CSS2DRenderer.js');
+  console.log('[BOOT] THREE & CSS2DRenderer loaded globally');
 
-    console.log('[BOOT] THREE & CSS2DRenderer loaded globally');
-
-    // 3️⃣ Now run your MapGen code safely — AFTER scripts are loaded
-    if (typeof window.vars.JAVASCRIPT_SOURCE === "string") {
-      eval(window.vars.JAVASCRIPT_SOURCE);
-    } else {
-      console.warn('[BOOT] JAVASCRIPT_SOURCE missing');
-    }
-
-  } catch (err) {
-    console.error('[BOOT] Error loading scripts', err);
+  if (typeof window.vars.JAVASCRIPT_SOURCE === "string") {
+    eval(window.vars.JAVASCRIPT_SOURCE);
   }
 })();
