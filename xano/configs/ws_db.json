@@ -5,5 +5,21 @@
     "limit": 50,
     "size": 50000
   },
-  "mapcore": "ewogIG1ldGE6IHsKICAgIGlkOiAiY29yZSIsCiAgICBkaXNwbGF5TmFtZTogIlRNUCIsCiAgICBpY29uOiAiaHR0cHM6Ly9leGFtcGxlLmNvbS9pY29ucy9tYXRjaC5wbmciCiAgfSwKICBvbmNsaWNrOiB7CiAgICBlbWJlZDogdHJ1ZSwKICAgIGRhdGE6IHt9CiAgfSwKICBjb29yZHM6IHsKICAgIHk6IDAsCiAgICBwYXJlbnQ6IG51bGwsCiAgICBleGlzdDogMCwKICAgIG9yYml0OiAwCiAgfQp9"
+  "mapcore": {
+  "meta": {
+    "id": "core",
+    "displayName": "TMP",
+    "icon": "https://example.com/icons/match.png"
+  },
+  "onclick": {
+    "embed": "true",
+    "data": {}
+  },
+  "coords": {
+    "y": 0,
+    "parent": null,
+    "exist": 0,
+    "orbit": 0
+  }
+}
 }
