@@ -2,8 +2,8 @@
   "results": "https://ws.mentalisit.myds.me/matches?limit=$$limit$$&page=$$loopcount$$",
   "corporations": "https://ws.mentalisit.myds.me/corps",
   "chunks": {
-    "limit": 5,
-    "size": 10000
+    "limit": 50,
+    "size": 50000
   },
-  "mapcore": "e30="
+  "mapcore": "ewogIG1ldGE6IHsKICAgIGlkOiAiY29yZSIsCiAgICBkaXNwbGF5TmFtZTogIlRNUCIsCiAgICBpY29uOiAiaHR0cHM6Ly9leGFtcGxlLmNvbS9pY29ucy9tYXRjaC5wbmciCiAgfSwKICBvbmNsaWNrOiB7CiAgICBlbWJlZDogdHJ1ZSwKICAgIGRhdGE6IHt9CiAgfSwKICBjb29yZHM6IHsKICAgIHk6IDAsCiAgICBwYXJlbnQ6IG51bGwsCiAgICBleGlzdDogMCwKICAgIG9yYml0OiAwCiAgfQp9"
 }
