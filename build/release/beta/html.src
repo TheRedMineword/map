@@ -9,8 +9,6 @@ $$style here$$
 </style>
 </head>
 <body>
-<pre id="log"></pre>
-
 <script>
 $$SCRIPT HERE$$
 </script>
