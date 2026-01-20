@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+$$META TAGS HERE$$
+<title>$$TITLE HERE$$</title>
+<script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
+<style>
+$$style here$$
+</style>
+</head>
+<body>
+<pre id="log"></pre>
+
+<script>
+$$SCRIPT HERE$$
+</script>
+</body>
+</html>
