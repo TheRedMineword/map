@@ -5,6 +5,7 @@
 
 console.log("[MapGen] animate.js loaded");
 
+MapGen.labelRenderer.domElement.style.zIndex = "9999";
 MapGen._lastTime = performance.now();
 
 MapGen.animate = function (time) {
@@ -33,4 +34,5 @@ MapGen.start = function () {
   console.log("[MapGen] animation started");
   requestAnimationFrame(MapGen.animate);
 };
+
 
