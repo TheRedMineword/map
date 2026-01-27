@@ -5,6 +5,13 @@
 
 console.log("[MapGen] construct.js loaded");
 
+window.MapGen = {
+  objects: new Map(),
+  _ready: false,
+  _started: false
+};
+
+
 window.MapGen = window.MapGen || {};
 MapGen.objects = new Map();
 
@@ -175,4 +182,5 @@ MapGen.clear = function () {
 
 MapGen._ready = true;
 console.log("[MapGen] READY");
+
 
