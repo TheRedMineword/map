@@ -82,6 +82,13 @@ function cleanupMapGen() {
     eval(window.vars.JAVASCRIPT_SOURCE);
   }
 
+  // Now you can safely use it anywhere
+  MapGen.labelRenderer = new CSS2DRenderer();
+  MapGen.labelRenderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(MapGen.labelRenderer.domElement);
+
+
+     
   } catch (err) {
     console.error("[Init] fatal error", err);
   }
