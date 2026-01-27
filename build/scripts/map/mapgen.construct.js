@@ -157,4 +157,8 @@ MapGen.clear = function () {
   console.log("[MapGen] clear()");
   MapGen.objects.forEach((e) => MapGen.scene.remove(e.node));
   MapGen.objects.clear();
+
 };
+
+MapGen._ready = true;
+console.log("[MapGen] READY");
