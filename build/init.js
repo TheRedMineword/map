@@ -77,6 +77,10 @@ function cleanupMapGen() {
 
     cleanupMapGen();
 
+     
+  if (typeof window.vars.JAVASCRIPT_SOURCE === "string") {
+    eval(window.vars.JAVASCRIPT_SOURCE);
+  }
 
   } catch (err) {
     console.error("[Init] fatal error", err);
