@@ -9,7 +9,7 @@
   "meta": {
     "id": "core",
     "displayName": "TMP",
-    "icon": "https://example.com/icons/match.png"
+    "icon": "https://theredmineword.github.io/map/img_src/star_dark.png"
   },
   "onclick": {
     "embed": "true",
