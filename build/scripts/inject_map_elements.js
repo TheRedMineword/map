@@ -28,6 +28,6 @@ MapGen.start();
 // MapGen.init();
 MapGen.pushBlob(window.vars.MAP_BLOB);
 (function loop() {
-  MapGen.render();
+  MapGen.animate();
   requestAnimationFrame(loop);
 })();
