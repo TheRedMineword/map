@@ -116,6 +116,11 @@ MapGen._resolvePosition = function (obj) {
    ========================= */
 
 MapGen.push = function (obj) {
+  if (!MapGen._ready) {
+    console.warn("[MapGen] push() called before init — ignored", obj);
+    return;
+  }
+
   if (!obj?.meta?.id) {
     console.warn("[MapGen] push() missing meta.id", obj);
     return;
@@ -125,7 +130,14 @@ MapGen.push = function (obj) {
 
   if (!entry) {
     console.log("[MapGen] push() new object", obj.meta.id);
+
     const node = MapGen._createObject(obj);
+
+    if (!MapGen.scene) {
+      console.error("[MapGen] scene missing despite ready=true");
+      return;
+    }
+
     MapGen.scene.add(node);
 
     entry = {
@@ -143,6 +155,7 @@ MapGen.push = function (obj) {
   const p = MapGen._resolvePosition(obj);
   entry.targetPos.set(p.x, p.y, p.z);
 };
+
 
 MapGen.remove = function (id) {
   console.log("[MapGen] remove()", id);
@@ -162,3 +175,4 @@ MapGen.clear = function () {
 
 MapGen._ready = true;
 console.log("[MapGen] READY");
+
