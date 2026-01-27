@@ -75,7 +75,7 @@ function cleanupMapGen() {
 
     console.log("[Init] THREE + CSS2D ready");
 
-    cleanupMapGen();
+  //  cleanupMapGen();
 
      
   if (typeof window.vars.JAVASCRIPT_SOURCE === "string") {
