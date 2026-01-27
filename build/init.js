@@ -1,94 +1,103 @@
-log("[INITIATION] STARTING MAP LOAD");
-const logo_ascii = "          _____                    _____                    _____                    _____          \r\n         /\\    \\                  /\\    \\                  /\\    \\                  /\\    \\         \r\n        /::\\____\\                /::\\    \\                /::\\____\\                /::\\    \\        \r\n       /::::|   |               /::::\\    \\              /::::|   |               /::::\\    \\       \r\n      /:::::|   |              /::::::\\    \\            /:::::|   |              /::::::\\    \\      \r\n     /::::::|   |             /:::/\\:::\\    \\          /::::::|   |             /:::/\\:::\\    \\     \r\n    /:::/|::|   |            /:::/__\\:::\\    \\        /:::/|::|   |            /:::/__\\:::\\    \\    \r\n   /:::/ |::|   |           /::::\\   \\:::\\    \\      /:::/ |::|   |           /::::\\   \\:::\\    \\   \r\n  /:::/  |::|___|______    /::::::\\   \\:::\\    \\    /:::/  |::|___|______    /::::::\\   \\:::\\    \\  \r\n /:::/   |::::::::\\    \\  /:::/\\:::\\   \\:::\\ ___\\  /:::/   |::::::::\\    \\  /:::/\\:::\\   \\:::\\ ___\\ \r\n/:::/    |:::::::::\\____\\/:::/__\\:::\\   \\:::|    |/:::/    |:::::::::\\____\\/:::/__\\:::\\   \\:::|    |\r\n\\::/    / ~~~~~/:::/    /\\:::\\   \\:::\\  /:::|____|\\::/    / ~~~~~/:::/    /\\:::\\   \\:::\\  /:::|____|\r\n \\/____/      /:::/    /  \\:::\\   \\:::\\/:::/    /  \\/____/      /:::/    /  \\:::\\   \\:::\\/:::/    / \r\n             /:::/    /    \\:::\\   \\::::::/    /               /:::/    /    \\:::\\   \\::::::/    /  \r\n            /:::/    /      \\:::\\   \\::::/    /               /:::/    /      \\:::\\   \\::::/    /   \r\n           /:::/    /        \\:::\\  /:::/    /               /:::/    /        \\:::\\  /:::/    /    \r\n          /:::/    /          \\:::\\/:::/    /               /:::/    /          \\:::\\/:::/    /     \r\n         /:::/    /            \\::::::/    /               /:::/    /            \\::::::/    /      \r\n        /:::/    /              \\::::/    /               /:::/    /              \\::::/    /       \r\n        \\::/    /                \\::/____/                \\::/    /                \\::/____/        \r\n         \\/____/                  ~~                       \\/____/                  ~~              \r\n                                                                                                    ";
-logascii(logo_ascii);
-log("[WARN] BOOTING");
-
-
-
-
-
 /* ============================================================
    INIT.JS
-   Script loader + MapGen bootstrap
+   Full MapGen bootstrap + clean black HTML
    ============================================================ */
 
 console.log("[Init] init.js loaded");
 
+// -----------------------------
+// 1️⃣ Reset page to plain black
+// -----------------------------
+function resetPageToBlack() {
+  document.documentElement.innerHTML = "";
+  document.documentElement.style.margin = "0";
+  document.documentElement.style.padding = "0";
+  document.documentElement.style.background = "black";
+
+  const body = document.createElement("body");
+  body.style.margin = "0";
+  body.style.padding = "0";
+  body.style.background = "black";
+  body.style.overflow = "hidden";
+
+  document.documentElement.appendChild(body);
+  console.log("[Init] page reset to black");
+}
+resetPageToBlack();
+
+// -----------------------------
+// 2️⃣ Create root container
+// -----------------------------
+const root = document.createElement("div");
+root.id = "mapgen-root";
+root.style.position = "fixed";
+root.style.inset = "0";
+root.style.background = "black";
+document.body.appendChild(root);
+console.log("[Init] mapgen-root created");
+
+// -----------------------------
+// 3️⃣ Script loader
+// -----------------------------
 async function loadScript(url) {
   return new Promise((resolve, reject) => {
     console.log("[Init] loading script:", url);
-
-    const script = document.createElement("script");
-    script.src = url;
-    script.onload = () => {
+    const s = document.createElement("script");
+    s.src = url;
+    s.onload = () => {
       console.log("[Init] loaded:", url);
       resolve();
     };
-    script.onerror = (e) => {
+    s.onerror = (e) => {
       console.error("[Init] failed to load:", url, e);
       reject(e);
     };
-
-    document.head.appendChild(script);
+    document.head.appendChild(s);
   });
 }
 
-/* =========================
-   CLEANUP
-   ========================= */
-
-function cleanupMapGen() {
-  console.log("[Init] cleanupMapGen()");
-
-  // remove root container
-  const oldRoot = document.getElementById("mapgen-root");
-  if (oldRoot) {
-    console.log("[Init] removing old mapgen-root");
-    oldRoot.remove();
-  }
-
-  // clear MapGen state if exists
-  if (window.MapGen) {
-    console.log("[Init] clearing MapGen state");
-
-    if (MapGen.objects) MapGen.objects.clear();
-    MapGen.scene = null;
-    MapGen.camera = null;
-    MapGen.labelRenderer = null;
-  }
-}
-
-/* =========================
-   BOOTSTRAP
-   ========================= */
-
+// -----------------------------
+// 4️⃣ Bootstrap sequence
+// -----------------------------
 (async () => {
   try {
+    // Load Three.js
     await loadScript("https://cdn.jsdelivr.net/npm/three@0.131.1/build/three.min.js");
-    await loadScript(
-      "https://cdn.jsdelivr.net/npm/three@0.131.1/examples/js/renderers/CSS2DRenderer.js"
-    );
+    // Load CSS2DRenderer
+    await loadScript("https://cdn.jsdelivr.net/npm/three@0.131.1/examples/js/renderers/CSS2DRenderer.js");
 
-    // expose CSS2D helpers globally
+    // Expose globally
     window.CSS2DRenderer = THREE.CSS2DRenderer;
     window.CSS2DObject   = THREE.CSS2DObject;
 
     console.log("[Init] THREE + CSS2D ready");
 
-  //  cleanupMapGen();
+    // Evaluate injected MapGen scripts
+    if (typeof window.vars?.JAVASCRIPT_SOURCE === "string") {
+      console.log("[Init] evaluating injected MapGen code");
+      eval(window.vars.JAVASCRIPT_SOURCE);
+    }
 
-     
-  if (typeof window.vars.JAVASCRIPT_SOURCE === "string") {
-    eval(window.vars.JAVASCRIPT_SOURCE);
-  }
+    // -----------------------------
+    // 5️⃣ Initialize MapGen
+    // -----------------------------
+    if (!window.MapGen || typeof MapGen.init !== "function") {
+      throw new Error("[Init] MapGen.init() missing");
+    }
 
-  // Now you can safely use it anywhere
-  MapGen.labelRenderer = new CSS2DRenderer();
-  MapGen.labelRenderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(MapGen.labelRenderer.domElement);
+    console.log("[Init] calling MapGen.init()");
+    MapGen.init(root);
 
+    console.log("[Init] calling MapGen.start()");
+    MapGen.start();
 
-     
+    console.log("[Init] MapGen bootstrap complete:", {
+      ready: MapGen._ready,
+      scene: !!MapGen.scene,
+      camera: !!MapGen.camera,
+      renderer: !!MapGen.labelRenderer
+    });
+
   } catch (err) {
     console.error("[Init] fatal error", err);
   }
