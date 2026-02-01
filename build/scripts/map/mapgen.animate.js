@@ -10,6 +10,13 @@ MapGen._lastTime = performance.now();
 
 MapGen.animate = function (time = performance.now()) {
 
+if (!MapGen.webglRenderer || !MapGen.labelRenderer) {
+  console.warn("[MapGen] animate skipped — renderer missing");
+  requestAnimationFrame(MapGen.animate);
+  return;
+}
+
+   
   if (!MapGen._lastTime) MapGen._lastTime = time;
   const dt = Math.min(0.1, (time - MapGen._lastTime) / 1000);
   MapGen._lastTime = time;
@@ -45,6 +52,7 @@ MapGen.start = function () {
 
 
 MapGen.start();
+
 
 
 
