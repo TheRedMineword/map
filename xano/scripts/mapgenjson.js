@@ -13,7 +13,21 @@ var jsonStr = atob(base64);
 var input = JSON.parse(jsonStr);
 
 var matches = input && input.matches ? input.matches : [];
+/* ===========================
+hash corporation ids
+// =========================== */
 
+const SEED = 1337;
+
+
+function seededId(str, seed) {
+  let hash = 2166136261 ^ seed;
+  for (let i = 0; i < str.length; i++) {
+    hash ^= str.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return (hash >>> 0).toString(36);
+}
 /* =========================
    CONSTANTS
    ========================= */
@@ -95,8 +109,8 @@ for (var i = 0; i < matches.length; i++) {
         JSON.stringify({
           match: m.MatchId,
           slug: slug,
-          c1: m.Corporation1Id,
-          c2: m.Corporation2Id
+  c1: seededId(String(m.Corporation1Id), SEED),
+  c2: seededId(String(m.Corporation2Id), SEED)
         }) +
         ")"
     },
