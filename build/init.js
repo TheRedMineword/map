@@ -32,7 +32,7 @@ const root = document.createElement("div");
 root.id = "mapgen-root";
 root.style.position = "fixed";
 root.style.inset = "0";
-root.style.background = "black";
+// root.style.background = "black";
 document.body.appendChild(root);
 console.log("[Init] mapgen-root created");
 
