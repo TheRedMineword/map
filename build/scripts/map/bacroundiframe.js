@@ -4,39 +4,13 @@ MapGen.initBackground = function (options = {}) {
     return;
   }
 
-var generateBaseBackgroundURLSync = generateBaseBackgroundURLSync || function(
-  base = "https://theredmineword.github.io/map/build/iframe/spacesky.html"
-){
-  const now = Math.floor(Date.now()/1000);
-  const interval7min = Math.floor(now / 420);
+ const {
+    url = "https://theredmineword.github.io/map/build/iframe/spacesky.html",
+    storageKey = "MapGen:lastDump.camera_pov",
+    consoleLog = false,
+    zIndex = 0
+  } = options;
 
-  const str = window.location.href;
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = ((hash << 5) - hash) + str.charCodeAt(i);
-    hash |= 0;
-  }
-  const hashHex = (hash >>> 0).toString(16);
-
-  const bypass = `${interval7min}_${hashHex}`;
-
-  console.log("Unix now:", now);
-  console.log("Page URL:", str);
-  console.log("Hash:", hashHex);
-  console.log("Bypass:", bypass);
-
-  return `${base}?bypass=${bypass}`;
-};
-
-
-
-  
-const {
-  url: generateBaseBackgroundURLSync(),
-  storageKey: "MapGen:lastDump.camera_pov",
-  consoleLog: false,
-  zIndex: 0
-} = options;
 
 
 
@@ -51,8 +25,31 @@ const {
 
   console.log("[MapGen] Initializing SpaceSky background");
 
+
+var storagebypass = (function(){
+  const now = Math.floor(Date.now()/1000);
+  const interval7min = Math.floor(now / 420); // changes every 7 min
+
+  const str = window.location.href;
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash |= 0;
+  }
+  const hashHex = (hash >>> 0).toString(16);
+
+  console.log("Unix now:", now);
+  console.log("Page URL:", str);
+  console.log("Hash:", hashHex);
+  console.log("Bypass:", interval7min + "_" + hashHex);
+
+  return interval7min + "_" + hashHex;
+})();
+
+
+  
   const iframe = document.createElement("iframe");
-  iframe.src = `${url}&console_log=${consoleLog}&localstoragekey=${storageKey}`;
+  iframe.src = `${url}?console_log=${consoleLog}&localstoragekey=${storageKey}&bypass=${storagebypass}`;
   iframe.style.position = "absolute";
   iframe.style.top = 0;
   iframe.style.left = 0;
