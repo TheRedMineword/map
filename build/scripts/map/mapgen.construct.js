@@ -44,6 +44,16 @@ MapGen.init = function (root) {
   MapGen.labelRenderer.domElement.style.zIndex = "10";
   MapGen.labelRenderer.domElement.style.pointerEvents = "none";
 
+MapGen.webglRenderer = new THREE.WebGLRenderer({ alpha: true });
+MapGen.webglRenderer.setSize(window.innerWidth, window.innerHeight);
+MapGen.webglRenderer.domElement.style.position = "absolute";
+MapGen.webglRenderer.domElement.style.top = "0";
+MapGen.webglRenderer.domElement.style.left = "0";
+MapGen.webglRenderer.domElement.style.zIndex = "0";   // behind labels
+root.appendChild(MapGen.webglRenderer.domElement);
+
+   
+
   root.appendChild(MapGen.labelRenderer.domElement);
 
   window.addEventListener("resize", MapGen._onResize);
@@ -179,6 +189,7 @@ MapGen.clear = function () {
 
 MapGen._ready = true;
 console.log("[MapGen] READY");
+
 
 
 
