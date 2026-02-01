@@ -13,15 +13,18 @@ MapGen.animate = function (time = performance.now()) {
 
   if (!MapGen.scene || !MapGen.camera) {
     requestAnimationFrame(MapGen.animate);
+     console,log("a");
     return;
   }
 
   if (MapGen.webglRenderer) {
     MapGen.webglRenderer.render(MapGen.scene, MapGen.camera);
+     console,log("b");
   }
 
   if (MapGen.labelRenderer) {
     MapGen.labelRenderer.render(MapGen.scene, MapGen.camera);
+     console.log("c");
   }
 
    MapGen.objects.forEach(entry => {
@@ -32,6 +35,7 @@ MapGen.animate = function (time = performance.now()) {
      // 🔥 DUMP LOGIC
   MapGen.maybeDump(time);
   requestAnimationFrame(MapGen.animate);
+   console.log("d");
    //console.count("frame");
 
 };
@@ -58,6 +62,7 @@ MapGen.start = function () {
 
 
 //temponary?// MapGen.start();
+
 
 
 
