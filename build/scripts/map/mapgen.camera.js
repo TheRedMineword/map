@@ -15,3 +15,13 @@ MapGen.focus = function () {
 
   MapGen.camera.lookAt(center);
 };
+
+
+
+
+MapGen._onResize = function () {
+  console.log("[MapGen] resize");
+  MapGen.camera.aspect = window.innerWidth / window.innerHeight;
+  MapGen.camera.updateProjectionMatrix();
+  MapGen.labelRenderer.setSize(window.innerWidth, window.innerHeight);
+};
