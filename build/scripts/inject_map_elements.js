@@ -24,11 +24,11 @@ items.forEach(MapGen.push);
 
 
 // INIT //
-MapGen.start();
+//temponary?// MapGen.start();
 // MapGen.init();
-MapGen.pushBlob(window.vars.MAP_BLOB);
-MapGen.focus();
-console.log("[CAMERA]: MapGen.focus();");
+//temponary?// MapGen.pushBlob(window.vars.MAP_BLOB);
+//temponary?// MapGen.focus();
+//temponary?// console.log("[CAMERA]: MapGen.focus();");
 
 
 
@@ -37,3 +37,16 @@ console.log("[CAMERA]: MapGen.focus();");
 //  MapGen.animate();
 //  requestAnimationFrame(loop);
 //})();
+
+
+
+
+
+console.log("[DAS INIT REAL1!!11!!]: We all gonna die");
+console.log("MapGen.init(document.getElementById("mapgen-root"));\nMapGen.start();\nMapGen.pushBlob(window.vars.MAP_BLOB);\nMapGen.focus();");
+
+MapGen.init(document.getElementById("mapgen-root"));
+MapGen.start();
+MapGen.pushBlob(window.vars.MAP_BLOB);
+MapGen.focus();
+
