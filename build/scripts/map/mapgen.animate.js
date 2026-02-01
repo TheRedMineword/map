@@ -25,6 +25,8 @@ MapGen.animate = function (time = performance.now()) {
   }
 
   requestAnimationFrame(MapGen.animate);
+   console.count("frame");
+
 };
 
 
@@ -55,6 +57,7 @@ MapGen.start = function () {
 
 
 MapGen.start();
+
 
 
 
