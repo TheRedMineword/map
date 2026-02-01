@@ -31,6 +31,10 @@ MapGen.animate = function (time = performance.now()) {
   entry.node.position.copy(entry.targetPos);
 });
 
+const delta = (time - MapGen._lastTime) / 1000;
+MapGen._lastTime = time;
+
+MapGen._updateCameraMovement(delta);
 
      // 🔥 DUMP LOGIC
   MapGen.maybeDump(time);
@@ -62,6 +66,7 @@ MapGen.start = function () {
 
 
 //temponary?// MapGen.start();
+
 
 
 
