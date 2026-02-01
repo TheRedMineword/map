@@ -28,12 +28,16 @@ MapGen.animate = function (time) {
 };
 
 // start loop explicitly
-MapGen.init();
+// MapGen.init();
+MapGen.init(root);
+MapGen.start();
+
 
 MapGen.start = function () {
   console.log("[MapGen] animation started");
   requestAnimationFrame(MapGen.animate);
 };
+
 
 
 
