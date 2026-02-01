@@ -88,8 +88,8 @@ void main(){
 
   ray = rotY(camRot.y) * rotX(camRot.x) * ray;
 
-  // March through space
-  vec3 p = camPos;
+  // ---- Slower space movement ----
+  vec3 p = camPos * 0.3; // slow down background relative to camera
   float density = 0.0;
   for(int i=0;i<6;i++){
     p += ray * 8.0;
@@ -97,13 +97,23 @@ void main(){
   }
   density /= 6.0;
 
-  vec3 nebColor = vec3(0.2,0.3,0.6) * density * density;
+  // ---- Blue-purple nebula ----
+  vec3 nebColor = vec3(0.3,0.2,0.6) * density * density; // purple-blue base
+  nebColor += vec3(0.2,0.3,0.8) * pow(density,3.0); // brighter highlights
 
-  // Stars in world space
+  // ---- Stars in world space ----
   vec3 starPos = camPos + ray * 200.0;
   float star = step(0.9997, hash(floor(starPos*2.0)));
 
   vec3 col = nebColor + vec3(star);
+
+  // ---- Random flashes ----
+  float flashChance = 0.002; // low chance
+  float flash = step(1.0-flashChance, fract(sin(dot(gl_FragCoord.xy,vec2(12.9898,78.233)))*43758.5453));
+  if(flash > 0.0){
+    col += vec3(0.8,0.7,1.0) * flash; // bluish-white flash
+  }
+
   gl_FragColor = vec4(col,1.0);
 }
 `;
