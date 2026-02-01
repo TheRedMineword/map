@@ -28,6 +28,9 @@ MapGen.animate = function (time = performance.now()) {
   entry.node.position.copy(entry.targetPos);
 });
 
+
+     // 🔥 DUMP LOGIC
+  MapGen.maybeDump(time);
   requestAnimationFrame(MapGen.animate);
    //console.count("frame");
 
@@ -55,6 +58,7 @@ MapGen.start = function () {
 
 
 //temponary?// MapGen.start();
+
 
 
 
