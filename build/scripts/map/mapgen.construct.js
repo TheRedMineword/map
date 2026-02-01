@@ -58,7 +58,9 @@ root.appendChild(MapGen.webglRenderer.domElement);
 
   window.addEventListener("resize", MapGen._onResize);
 
-
+MapGen.camera.position.set(0, 12000, 2000);
+MapGen.camera.lookAt(0, 12000, 0);
+console.log("Camera look: MapGen.camera.position.set(0, 12000, 2000);\nMapGen.camera.lookAt(0, 12000, 0);");
    MapGen._ready = true;
 console.log("[MapGen] READY");
 };
@@ -193,6 +195,7 @@ MapGen.clear = function () {
 
 //MapGen._ready = true;
 //console.log("[MapGen] READY");
+
 
 
 
