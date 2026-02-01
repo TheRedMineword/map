@@ -4,12 +4,46 @@ MapGen.initBackground = function (options = {}) {
     return;
   }
 
+async function genURL(options={}) {
   const {
     url = "https://theredmineword.github.io/map/build/iframe/spacesky.html",
     storageKey = "MapGen:lastDump.camera_pov",
-    consoleLog = false,
-    zIndex = 0
+    consoleLog = true
   } = options;
+
+  // --- 1. Current Unix time ---
+  const now = Math.floor(Date.now()/1000);
+  
+  // --- 2. SHA1 of current page URL ---
+  const data = new TextEncoder().encode(window.location.href);
+  const hashBuffer = await crypto.subtle.digest('SHA-1', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b=>b.toString(16).padStart(2,'0')).join('');
+
+  // --- 3. Unique cachebypass code (change every 7min) ---
+  const interval7min = Math.floor(now/420); // 7*60 = 420 sec
+  const uniqueCode = `${interval7min}_${hashHex}`;
+
+  if(consoleLog){
+    console.log("Unix now:", now);
+    console.log("Page URL:", window.location.href);
+    console.log("SHA1 hash:", hashHex);
+    console.log("Cachebypass code:", uniqueCode);
+  }
+
+  // --- 4. Build final URL ---
+  const params = new URLSearchParams({
+    localstoragekey: storageKey,
+    console_log: consoleLog,
+    cachebypass: uniqueCode
+  });
+
+  return `${url}?${params.toString()}`;
+}
+
+// --- Example usage ---
+genURL().then(u=>console.log("Generated URL:", u));
+
 
   const root = MapGen.root || document.getElementById("mapgen-root");
   if (!root) {
