@@ -1,0 +1,2 @@
+- Why the fuck when i eval in console script it dump json and not when via html (in loop)
+- Black text on black bacround, great job idiot
