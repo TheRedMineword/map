@@ -4,45 +4,43 @@ MapGen.initBackground = function (options = {}) {
     return;
   }
 
-async function genURL(options={}) {
-  const {
-    url = "https://theredmineword.github.io/map/build/iframe/spacesky.html",
-    storageKey = "MapGen:lastDump.camera_pov",
-    consoleLog = true
-  } = options;
-
-  // --- 1. Current Unix time ---
+function generateBaseBackgroundURLSync(
+  base = "https://theredmineword.github.io/map/build/iframe/spacesky.html"
+){
+  // --- Unix time (changes every 7 minutes) ---
   const now = Math.floor(Date.now()/1000);
-  
-  // --- 2. SHA1 of current page URL ---
-  const data = new TextEncoder().encode(window.location.href);
-  const hashBuffer = await crypto.subtle.digest('SHA-1', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray.map(b=>b.toString(16).padStart(2,'0')).join('');
+  const interval7min = Math.floor(now / 420);
 
-  // --- 3. Unique cachebypass code (change every 7min) ---
-  const interval7min = Math.floor(now/420); // 7*60 = 420 sec
-  const uniqueCode = `${interval7min}_${hashHex}`;
-
-  if(consoleLog){
-    console.log("Unix now:", now);
-    console.log("Page URL:", window.location.href);
-    console.log("SHA1 hash:", hashHex);
-    console.log("Cachebypass code:", uniqueCode);
+  // --- Fast string hash of current page URL ---
+  const str = window.location.href;
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash |= 0; // force 32-bit
   }
+  const hashHex = (hash >>> 0).toString(16);
 
-  // --- 4. Build final URL ---
-  const params = new URLSearchParams({
-    localstoragekey: storageKey,
-    console_log: consoleLog,
-    cachebypass: uniqueCode
-  });
+  const bypass = `${interval7min}_${hashHex}`;
 
-  return `${url}?${params.toString()}`;
+  console.log("Unix now:", now);
+  console.log("Page URL:", str);
+  console.log("Hash:", hashHex);
+  console.log("Bypass:", bypass);
+
+  return `${base}?bypass=${bypass}`;
 }
 
-// --- Example usage ---
-genURL().then(u=>console.log("Generated URL:", u));
+
+  
+const {
+  url = generateBaseBackgroundURLSync(),
+  storageKey = "MapGen:lastDump.camera_pov",
+  consoleLog = false,
+  zIndex = 0
+} = options;
+
+
+
 
 
   const root = MapGen.root || document.getElementById("mapgen-root");
@@ -54,7 +52,7 @@ genURL().then(u=>console.log("Generated URL:", u));
   console.log("[MapGen] Initializing SpaceSky background");
 
   const iframe = document.createElement("iframe");
-  iframe.src = `${url}?console_log=${consoleLog}&localstoragekey=${storageKey}`;
+  iframe.src = `${url}&console_log=${consoleLog}&localstoragekey=${storageKey}`;
   iframe.style.position = "absolute";
   iframe.style.top = 0;
   iframe.style.left = 0;
