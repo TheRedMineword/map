@@ -52,4 +52,9 @@ MapGen.focus();
 // 👇 force initial snapshot
 MapGen._lastCameraState = null;
 MapGen.dumpFrame();
+
+MapGen.initBackground({
+  consoleLog: false
+});
+
 console.log("[INFO]: started fucking your local storage");
