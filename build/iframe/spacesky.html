@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>Procedural Space v.2</title>
+<title>Procedural Space</title>
 <style>
   body,html { margin:0; overflow:hidden; background:black; }
   canvas { display:block; }
@@ -21,13 +21,14 @@ function log(...a){ if(LOG) console.log("[SPACE]",...a); }
 
 // ---- Load Camera POV ----
 let cam = { px:0, py:0, pz:0, rx:0, ry:0, rz:0, zoom:1 };
-let lastLogged = {};
+let lastCamJSON = JSON.stringify(cam);
 
 try {
   const raw = localStorage.getItem(storageKey);
   if(raw){
     const parsed = JSON.parse(raw);
     cam = parsed[field];
+    lastCamJSON = JSON.stringify(cam);
     log("Camera loaded", cam);
   }
 } catch(e){ log("Storage error", e); }
@@ -129,14 +130,42 @@ const u_camRot=gl.getUniformLocation(prog,"camRot");
 
 let start=Date.now()/1000;
 
-// ---- Detect camera changes ----
-function logCamIfChanged(){
-  const changed = Object.keys(cam).some(k => cam[k] !== lastLogged[k]);
-  if(changed){
-    log("Camera position", {px:cam.px, py:cam.py, pz:cam.pz, rx:cam.rx, ry:cam.ry, rz:cam.rz});
-    lastLogged = {...cam};
+// ---- Update camera from storage ----
+function updateCameraFromStorage(trigger){
+  try{
+    const raw = localStorage.getItem(storageKey);
+    if(!raw) return;
+    const parsed = JSON.parse(raw);
+    const newCam = parsed[field];
+    if(!newCam) return;
+
+    const newJSON = JSON.stringify(newCam);
+    if(newJSON !== lastCamJSON){
+      cam = newCam;
+      lastCamJSON = newJSON;
+      if(LOG){
+        console.log("[SPACE] Camera updated via", trigger, {
+          px: cam.px, py: cam.py, pz: cam.pz,
+          rx: cam.rx, ry: cam.ry, rz: cam.rz
+        });
+      }
+    }
+  } catch(e){
+    if(LOG) console.log("[SPACE] Storage read error", e);
   }
 }
+
+// ---- Listen for cross-page updates ----
+window.addEventListener("storage", (e)=>{
+  if(e.key === storageKey){
+    updateCameraFromStorage("storage-event");
+  }
+});
+
+// ---- Polling to catch same-page updates ----
+setInterval(()=>{
+  updateCameraFromStorage("polling");
+}, 50);
 
 // ---- Render Loop ----
 function draw(){
@@ -145,8 +174,6 @@ function draw(){
   gl.uniform2f(u_res,canvas.width,canvas.height);
   gl.uniform3f(u_camPos,cam.px,cam.py,cam.pz);
   gl.uniform3f(u_camRot,cam.rx,cam.ry,cam.rz);
-
-  logCamIfChanged();
 
   gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
   requestAnimationFrame(draw);
