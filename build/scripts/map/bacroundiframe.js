@@ -4,19 +4,17 @@ MapGen.initBackground = function (options = {}) {
     return;
   }
 
-function generateBaseBackgroundURLSync(
+var generateBaseBackgroundURLSync = generateBaseBackgroundURLSync || function(
   base = "https://theredmineword.github.io/map/build/iframe/spacesky.html"
 ){
-  // --- Unix time (changes every 7 minutes) ---
   const now = Math.floor(Date.now()/1000);
   const interval7min = Math.floor(now / 420);
 
-  // --- Fast string hash of current page URL ---
   const str = window.location.href;
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     hash = ((hash << 5) - hash) + str.charCodeAt(i);
-    hash |= 0; // force 32-bit
+    hash |= 0;
   }
   const hashHex = (hash >>> 0).toString(16);
 
@@ -28,16 +26,18 @@ function generateBaseBackgroundURLSync(
   console.log("Bypass:", bypass);
 
   return `${base}?bypass=${bypass}`;
-}
+};
+
 
 
   
 const {
-  url: generateBaseBackgroundURLSync(),
-  storageKey: "MapGen:lastDump.camera_pov",
-  consoleLog: false,
-  zIndex: 0
-} = options;
+  url = generateBaseBackgroundURLSync(),
+  storageKey = "MapGen:lastDump.camera_pov",
+  consoleLog = false,
+  zIndex = 0
+} = options || {};
+
 
 
 
