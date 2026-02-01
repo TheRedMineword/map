@@ -187,8 +187,9 @@ MapGen.clear = function () {
 
 };
 
-MapGen._ready = true;
-console.log("[MapGen] READY");
+//MapGen._ready = true;
+//console.log("[MapGen] READY");
+
 
 
 
