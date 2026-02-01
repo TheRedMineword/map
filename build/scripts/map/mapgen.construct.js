@@ -57,6 +57,10 @@ root.appendChild(MapGen.webglRenderer.domElement);
   root.appendChild(MapGen.labelRenderer.domElement);
 
   window.addEventListener("resize", MapGen._onResize);
+
+
+   MapGen._ready = true;
+console.log("[MapGen] READY");
 };
 
 
@@ -189,6 +193,7 @@ MapGen.clear = function () {
 
 //MapGen._ready = true;
 //console.log("[MapGen] READY");
+
 
 
 
