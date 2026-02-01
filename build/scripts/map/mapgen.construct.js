@@ -5,27 +5,26 @@
 
 console.log("[MapGen] construct.js loaded");
 
-window.MapGen = {
-  objects: new Map(),
-  _ready: false,
-  _started: false
-};
-
-
 window.MapGen = window.MapGen || {};
-MapGen.objects = new Map();
+MapGen.objects = MapGen.objects || new Map();
+MapGen._ready = false;
+MapGen._started = false;
+
 
 /* =========================
    INIT
    ========================= */
 
 MapGen.init = function (root) {
+  if (MapGen._ready) {
+    console.warn("[MapGen] init() already called — skipped");
+    return;
+  }
+
   console.log("[MapGen] init()");
+  if (!root) throw new Error("MapGen.init requires root");
 
-  if (!root) throw new Error("MapGen.init requires root element");
-
-  MapGen.root = root; // store reference
-
+  MapGen.root = root;
   MapGen.scene = new THREE.Scene();
 
   MapGen.camera = new THREE.PerspectiveCamera(
@@ -34,48 +33,34 @@ MapGen.init = function (root) {
     1,
     100000
   );
-  MapGen.camera.position.z = 1000;
+
+  MapGen.camera.position.set(0, 0, 2000);
+  MapGen.camera.lookAt(0, 0, 0);
+
+  MapGen.webglRenderer = new THREE.WebGLRenderer({ alpha: true });
+  MapGen.webglRenderer.setSize(window.innerWidth, window.innerHeight);
+  MapGen.webglRenderer.domElement.style.position = "absolute";
+  root.appendChild(MapGen.webglRenderer.domElement);
 
   MapGen.labelRenderer = new CSS2DRenderer();
   MapGen.labelRenderer.setSize(window.innerWidth, window.innerHeight);
   MapGen.labelRenderer.domElement.style.position = "absolute";
-  MapGen.labelRenderer.domElement.style.top = "0";
-  MapGen.labelRenderer.domElement.style.left = "0";
-  MapGen.labelRenderer.domElement.style.zIndex = "10";
   MapGen.labelRenderer.domElement.style.pointerEvents = "none";
-
-MapGen.webglRenderer = new THREE.WebGLRenderer({ alpha: true });
-MapGen.webglRenderer.setSize(window.innerWidth, window.innerHeight);
-MapGen.webglRenderer.domElement.style.position = "absolute";
-MapGen.webglRenderer.domElement.style.top = "0";
-MapGen.webglRenderer.domElement.style.left = "0";
-MapGen.webglRenderer.domElement.style.zIndex = "0";   // behind labels
-root.appendChild(MapGen.webglRenderer.domElement);
-
-   
-
   root.appendChild(MapGen.labelRenderer.domElement);
 
   window.addEventListener("resize", MapGen._onResize);
 
-MapGen.camera.position.set(0, 12000, 2000);
-MapGen.camera.lookAt(0, 12000, 0);
-console.log("Camera look: MapGen.camera.position.set(0, 12000, 2000);\nMapGen.camera.lookAt(0, 12000, 0);");
-   MapGen._ready = true;
-console.log("[MapGen] READY");
+  MapGen._ready = true;
+  console.log("[MapGen] READY");
 };
+
 
 
 /* =========================
    INTERNAL
    ========================= */
 
-MapGen._onResize = function () {
-  console.log("[MapGen] resize");
-  MapGen.camera.aspect = window.innerWidth / window.innerHeight;
-  MapGen.camera.updateProjectionMatrix();
-  MapGen.labelRenderer.setSize(window.innerWidth, window.innerHeight);
-};
+//on resize moved away to camera
 
 MapGen._createObject = function (obj) {
   console.log("[MapGen] creating object", obj?.meta?.id, obj);
@@ -195,6 +180,7 @@ MapGen.clear = function () {
 
 //MapGen._ready = true;
 //console.log("[MapGen] READY");
+
 
 
 
