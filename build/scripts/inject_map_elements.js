@@ -43,7 +43,7 @@ items.forEach(MapGen.push);
 
 
 console.log("[DAS INIT REAL1!!11!!]: We all gonna die");
-console.log("MapGen.init(document.getElementById("mapgen-root"));\nMapGen.start();\nMapGen.pushBlob(window.vars.MAP_BLOB);\nMapGen.focus();");
+console.log("MapGen.init(document.getElementById(\"mapgen-root\"));\nMapGen.start();\nMapGen.pushBlob(window.vars.MAP_BLOB);\nMapGen.focus();");
 
 MapGen.init(document.getElementById("mapgen-root"));
 MapGen.start();
