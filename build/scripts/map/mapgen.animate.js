@@ -33,12 +33,15 @@ MapGen.init(root);
 
 
 MapGen.start = function () {
-  console.log("[MapGen] animation started");
+  if (MapGen._started) return;
+  MapGen._started = true;
   requestAnimationFrame(MapGen.animate);
 };
 
 
 
+
 MapGen.start();
+
 
 
