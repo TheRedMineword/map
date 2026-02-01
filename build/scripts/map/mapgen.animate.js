@@ -39,15 +39,9 @@ MapGen.init(root);
 
 
 MapGen.start = function () {
-  if (!MapGen._ready) {
-    console.warn("[MapGen] start() called before init");
-    return;
-  }
+  if (!MapGen._ready || MapGen._started) return;
 
-  if (MapGen._started) return;
   MapGen._started = true;
-
-  console.log("[MapGen] animation started");
   requestAnimationFrame(MapGen.animate);
 };
 
@@ -57,6 +51,7 @@ MapGen.start = function () {
 
 
 MapGen.start();
+
 
 
 
