@@ -27,7 +27,11 @@ items.forEach(MapGen.push);
 MapGen.start();
 // MapGen.init();
 MapGen.pushBlob(window.vars.MAP_BLOB);
-(function loop() {
-  MapGen.animate();
-  requestAnimationFrame(loop);
-})();
+
+
+
+
+//(function loop() {
+//  MapGen.animate();
+//  requestAnimationFrame(loop);
+//})();
