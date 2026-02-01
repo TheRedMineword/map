@@ -12,20 +12,19 @@ MapGen.animate = function (time) {
   const dt = (time - MapGen._lastTime) / 1000;
   MapGen._lastTime = time;
 
-  MapGen.objects.forEach((entry, id) => {
+  MapGen.objects.forEach((entry) => {
     if (!entry.targetPos) return;
-
-    // debug once in a while
-    if (Math.random() < 0.001) {
-      console.log("[MapGen] animating", id, entry.node.position, entry.targetPos);
-    }
-
     entry.node.position.lerp(entry.targetPos, Math.min(1, dt * 6));
   });
 
+  // THIS is what fixes everything
+  MapGen.webglRenderer.render(MapGen.scene, MapGen.camera);
+
   MapGen.labelRenderer.render(MapGen.scene, MapGen.camera);
+
   requestAnimationFrame(MapGen.animate);
 };
+
 
 // start loop explicitly
 // MapGen.init();
@@ -41,4 +40,5 @@ MapGen.start = function () {
 
 
 MapGen.start();
+
 
