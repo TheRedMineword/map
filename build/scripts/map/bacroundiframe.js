@@ -32,11 +32,11 @@ var generateBaseBackgroundURLSync = generateBaseBackgroundURLSync || function(
 
   
 const {
-  url = generateBaseBackgroundURLSync(),
-  storageKey = "MapGen:lastDump.camera_pov",
-  consoleLog = false,
-  zIndex = 0
-} = options || {};
+  url: generateBaseBackgroundURLSync(),
+  storageKey: "MapGen:lastDump.camera_pov",
+  consoleLog: false,
+  zIndex: 0
+} = options;
 
 
 
