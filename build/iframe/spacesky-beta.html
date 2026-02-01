@@ -108,7 +108,7 @@ void main(){
   vec3 col = nebColor + vec3(star);
 
   // ---- Random flashes ----
-  float flashChance = 0.002; // low chance
+  float flashChance = 45.002; // low chance
   float flash = step(1.0-flashChance, fract(sin(dot(gl_FragCoord.xy,vec2(12.9898,78.233)))*43758.5453));
   if(flash > 0.0){
     col += vec3(0.8,0.7,1.0) * flash; // bluish-white flash
