@@ -24,6 +24,10 @@ MapGen.animate = function (time = performance.now()) {
     MapGen.labelRenderer.render(MapGen.scene, MapGen.camera);
   }
 
+   MapGen.objects.forEach(entry => {
+  entry.node.position.copy(entry.targetPos);
+});
+
   requestAnimationFrame(MapGen.animate);
    //console.count("frame");
 
@@ -34,7 +38,7 @@ MapGen.animate = function (time = performance.now()) {
 
 // start loop explicitly
 // MapGen.init();
-MapGen.init(root);
+//temponary?// MapGen.init(root);
 
 
 
@@ -50,7 +54,8 @@ MapGen.start = function () {
 
 
 
-MapGen.start();
+//temponary?// MapGen.start();
+
 
 
 
