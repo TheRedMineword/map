@@ -19,18 +19,14 @@ MapGen.objects = new Map();
    INIT
    ========================= */
 
-MapGen.init = function () {
+MapGen.init = function (root) {
   console.log("[MapGen] init()");
 
-  const root = document.createElement("div");
-  root.id = "mapgen-root";
-  root.style.position = "fixed";
-  root.style.inset = "0";
-  root.style.pointerEvents = "none"; // important
-  document.body.appendChild(root);
+  if (!root) throw new Error("MapGen.init requires root element");
+
+  MapGen.root = root; // store reference
 
   MapGen.scene = new THREE.Scene();
-  console.log("[MapGen] scene created");
 
   MapGen.camera = new THREE.PerspectiveCamera(
     60,
@@ -39,19 +35,20 @@ MapGen.init = function () {
     100000
   );
   MapGen.camera.position.z = 1000;
-  console.log("[MapGen] camera created");
 
   MapGen.labelRenderer = new CSS2DRenderer();
   MapGen.labelRenderer.setSize(window.innerWidth, window.innerHeight);
   MapGen.labelRenderer.domElement.style.position = "absolute";
   MapGen.labelRenderer.domElement.style.top = "0";
+  MapGen.labelRenderer.domElement.style.left = "0";
+  MapGen.labelRenderer.domElement.style.zIndex = "10";
   MapGen.labelRenderer.domElement.style.pointerEvents = "none";
-  root.appendChild(MapGen.labelRenderer.domElement);
 
-  console.log("[MapGen] CSS2DRenderer attached");
+  root.appendChild(MapGen.labelRenderer.domElement);
 
   window.addEventListener("resize", MapGen._onResize);
 };
+
 
 /* =========================
    INTERNAL
@@ -182,5 +179,6 @@ MapGen.clear = function () {
 
 MapGen._ready = true;
 console.log("[MapGen] READY");
+
 
 
