@@ -49,4 +49,7 @@ MapGen.init(document.getElementById("mapgen-root"));
 MapGen.start();
 MapGen.pushBlob(window.vars.MAP_BLOB);
 MapGen.focus();
-
+// 👇 force initial snapshot
+MapGen._lastCameraState = null;
+MapGen.dumpFrame();
+console.log("[INFO]: started fucking your local storage");
