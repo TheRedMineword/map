@@ -30,7 +30,7 @@ MapGen.animate = function (time) {
 // start loop explicitly
 // MapGen.init();
 MapGen.init(root);
-MapGen.start();
+
 
 
 MapGen.start = function () {
@@ -40,4 +40,5 @@ MapGen.start = function () {
 
 
 
+MapGen.start();
 
