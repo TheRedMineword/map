@@ -27,6 +27,8 @@ items.forEach(MapGen.push);
 MapGen.start();
 // MapGen.init();
 MapGen.pushBlob(window.vars.MAP_BLOB);
+MapGen.focus();
+console.log("[CAMERA]: MapGen.focus();");
 
 
 
