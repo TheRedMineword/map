@@ -10,7 +10,7 @@ MapGen.initBackground = function (options = {}) {
     consoleLog = false,
     zIndex = 0
   } = options;
-
+console.log(url);
 
 
 
