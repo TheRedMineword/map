@@ -15,6 +15,44 @@ MapGen._started = false;
    INIT
    ========================= */
 
+MapGen._injectStyles = function () {
+
+  if (document.getElementById("mapgen-styles")) return;
+
+  const style = document.createElement("style");
+  style.id = "mapgen-styles";
+
+  style.textContent = `
+  
+  .mapgen-object{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    position:relative;
+  }
+
+  .mapgen-label{
+    color:white;
+    white-space:pre-line;
+    font-size:12px;
+    text-align:center;
+    margin-top:2px;
+    font-family:sans-serif;
+    pointer-events:none;
+  }
+
+  `;
+
+  document.head.appendChild(style);
+
+  console.log("[MapGen] styles injected");
+};
+
+
+
+
+
+
 MapGen.init = function (root) {
   if (MapGen._ready) {
     console.warn("[MapGen] init() already called — skipped");
@@ -25,6 +63,10 @@ MapGen.init = function (root) {
   if (!root) throw new Error("MapGen.init requires root");
 
   MapGen.root = root;
+
+   console.log("MapGen._injectStyles();");
+MapGen._injectStyles();
+   
   MapGen.scene = new THREE.Scene();
 
   MapGen.camera = new THREE.PerspectiveCamera(
@@ -70,21 +112,48 @@ MapGen._createObject = function (obj) {
   const el = document.createElement("div");
   el.className = "mapgen-object";
   el.style.pointerEvents = "auto";
+  el.style.position = "relative";
+  el.style.display = "flex";
+  el.style.flexDirection = "column";
+  el.style.alignItems = "center";
+
+  let auraColor = "#00eaff";
+  let auraSize = 10;
+
+  if (obj.meta?.aura) {
+    auraColor = obj.meta.aura.hex || auraColor;
+    auraSize = obj.meta.aura.size || auraSize;
+  }
 
   if (obj.meta?.icon) {
+
+    const iconWrap = document.createElement("div");
+    iconWrap.style.position = "relative";
+
     const img = document.createElement("img");
     img.src = obj.meta.icon;
     img.width = 32;
     img.height = 32;
     img.draggable = false;
-    el.appendChild(img);
+
+    img.style.filter =
+      `drop-shadow(0 0 ${auraSize}px ${auraColor})`;
+
+    iconWrap.appendChild(img);
+    el.appendChild(iconWrap);
   }
 
   if (obj.meta?.displayName) {
     console.log("[MapGen] label text:", obj.meta.displayName);
+
     const label = document.createElement("div");
     label.className = "mapgen-label";
+
+    label.style.color = "white";
+    label.style.whiteSpace = "pre-line";
+
     label.textContent = obj.meta.displayName;
+
     el.appendChild(label);
   }
 
