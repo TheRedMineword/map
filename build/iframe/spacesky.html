@@ -25,7 +25,9 @@ canvas{
 /* =========================================
    PARAMS + LOGGING
 ========================================= */
+const ZOOM = 0.10;   // zoom + camera movement scale
 
+  
 const params = new URLSearchParams(location.search);
 
 const LOG = params.get("console_log") === "true";
@@ -397,17 +399,30 @@ setInterval(()=>{
    RENDER LOOP
 ========================================= */
 
+
 function draw(){
+
+  console.log("draw()");
+  console.log("canvas:", canvas.width, canvas.height);
+  console.log("camPos raw:", cam.px, cam.py, cam.pz);
+  console.log("camRot:", cam.rx, cam.ry, cam.rz);
+  console.log("seed:", seed);
 
   gl.uniform2f(U("u_res"), canvas.width, canvas.height);
 
-  gl.uniform3f(U("camPos"),
+  const camZ = cam.pz * ZOOM;
+
+  console.log("camPos scaled:", cam.px, cam.py, camZ);
+
+  gl.uniform3f(
+    U("camPos"),
     cam.px,
     cam.py,
-    cam.pz * 0.25   /* slower zoom */
+    camZ
   );
 
-  gl.uniform3f(U("camRot"),
+  gl.uniform3f(
+    U("camRot"),
     cam.rx,
     cam.ry,
     cam.rz
@@ -415,10 +430,11 @@ function draw(){
 
   gl.uniform1f(U("u_seed"), seed);
 
+  console.log("drawing frame");
+
   gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
 
   requestAnimationFrame(draw);
-
 }
 
 draw();
