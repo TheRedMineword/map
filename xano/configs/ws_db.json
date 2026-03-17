@@ -12,7 +12,7 @@
     "icon": "https://theredmineword.github.io/map/img_src/star_dark.png"
   },
   "onclick": {
-    "embed": "true",
+    "embed": true,
     "data": {
       "type": "article",
       "url": "https://theredmineword.github.io/map/index.html",
