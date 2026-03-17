@@ -5,7 +5,7 @@ MapGen.initBackground = function (options = {}) {
   }
 
  const {
-    url = "https://theredmineword.github.io/map/build/iframe/spacesky.html?seed=42&config=%7B%22nebulaPower%22%3A3.5%2C%22colorA%22%3A%5B0.1%2C0.0%2C0.3%5D%2C%22colorB%22%3A%5B0.2%2C0.5%2C1.0%5D%7D",
+    url = "https://theredmineword.github.io/map/build/iframe/spacesky.html?seed=54%0A%2094%0A%2037%0A%2032%0A100%0A%2012%0A%2022%0A%2017%0A%2081%0A%2058%0A%2066",
     storageKey = "MapGen:lastDump.camera_pov",
     consoleLog = false,
     zIndex = 0
