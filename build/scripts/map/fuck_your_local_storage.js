@@ -72,7 +72,7 @@ MapGen.dumpFrame = function () {
   const dump = {
     frame: MapGen._frameCount,
     time: performance.now(),
-    map: MapGen._getSceneDump(),
+  //  map: MapGen._getSceneDump(),
     camera: {
       fov: MapGen.camera.fov,
       near: MapGen.camera.near,
