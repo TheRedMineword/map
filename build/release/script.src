@@ -6,6 +6,8 @@ const logEl = document.getElementById("log");
 const log = (...a) => {
   // logEl.textContent += a.join(" ") + "\n";
 logEl.textContent = a.join(" ") + "\n" + logEl.textContent;
+//console.log(logEl.textContent);
+
 
   logEl.scrollTop = logEl.scrollHeight;
 
@@ -97,6 +99,9 @@ async function download(url, state) {
     len += value.length;
     state.done += value.length;
     log(
+      `Downloading ${(state.done / state.total * 100).toFixed(2)}% | Bytes ${state.done}/${state.total}`
+    );
+console.log(
       `Downloading ${(state.done / state.total * 100).toFixed(2)}% | Bytes ${state.done}/${state.total}`
     );
   }
