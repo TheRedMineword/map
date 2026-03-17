@@ -17,63 +17,11 @@ const LOG = params.get("console_log") === "true";
 
 function log(...a){ if(LOG) console.log("[SPACE]",...a); }
 
-// ---- SEED (deterministic) ----
-const seed = parseFloat(params.get("seed")) || 42;
-
-// ---- CONFIG ----
-let config = {
-  nebulaPower: 2.8,
-  densityBoost: 1.6,
-  colorA: [0.3,0.2,0.6],
-  colorB: [0.2,0.3,0.8],
-  starDensity: 0.6,
-  starSharpness: 120.0
-};
-
-// ---- LOAD settings.json ----
-let externalSettings = null;
-
-fetch("settings.json")
-.then(r=>r.json())
-.then(data=>{
-  externalSettings = data;
-
-  if(data.nebula){
-    config.nebulaPower = data.nebula.power || config.nebulaPower;
-    config.densityBoost = data.nebula.densityBoost || config.densityBoost;
-  }
-
-  if(data.stars){
-    config.starDensity = data.stars.density;
-    config.starSharpness = data.stars.sharpness;
-  }
-
-  pickGradient();
-});
-
-// ---- HEX → RGB ----
-function hexToRgb(hex){
-  const bigint = parseInt(hex.slice(1),16);
-  return [
-    ((bigint>>16)&255)/255,
-    ((bigint>>8)&255)/255,
-    (bigint&255)/255
-  ];
-}
-
-// ---- Gradient (deterministic per seed) ----
-function pickGradient(){
-  if(!externalSettings?.nebula?.gradients) return;
-
-  const index = Math.floor(seed) % externalSettings.nebula.gradients.length;
-  const g = externalSettings.nebula.gradients[index];
-
-  config.colorA = hexToRgb(g[0]);
-  config.colorB = hexToRgb(g[1]);
-}
-
 // ---- CAMERA ----
-let cam = { px:0, py:0, pz:0, rx:0, ry:0, rz:0, zoom:0.5 };
+let cam = { px:0, py:0, pz:0, rx:0, ry:0, rz:0 };
+
+// DEBUG movement (REMOVE later)
+setInterval(()=> cam.pz += 0.2, 16);
 
 // ---- WEBGL ----
 const canvas = document.getElementById("c");
@@ -100,24 +48,9 @@ uniform float u_time;
 uniform vec2 u_res;
 uniform vec3 camPos;
 uniform vec3 camRot;
-uniform float u_zoom;
-uniform float u_seed;
-
-uniform vec3 u_colorA;
-uniform vec3 u_colorB;
-uniform float u_nebulaPower;
-uniform float u_densityBoost;
-
-uniform float u_starDensity;
-uniform float u_starSharpness;
-
-uniform vec3 u_eventPos;
-uniform float u_eventType;
-uniform float u_eventStrength;
 
 // ---- HASH ----
 float hash(vec3 p){
-  p += u_seed;
   p = fract(p * 0.3183099 + .1);
   p *= 17.0;
   return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
@@ -145,16 +78,16 @@ float fbm(vec3 p){
   return f;
 }
 
-// ---- ROTATION ----
+// ---- ROT ----
 mat3 rotY(float a){ return mat3(cos(a),0.,sin(a), 0.,1.,0., -sin(a),0.,cos(a)); }
 mat3 rotX(float a){ return mat3(1.,0.,0., 0.,cos(a),-sin(a), 0.,sin(a),cos(a)); }
 
-// ---- NEBULA CLUSTER MASK ----
-float nebulaMask(vec3 p){
+// ---- NEBULA BLOBS ----
+float nebulaBlob(vec3 p){
   vec3 cell = floor(p * 0.05);
   float h = hash(cell);
 
-  if(h < 0.7) return 0.0;
+  if(h < 0.75) return 0.0;
 
   float size = mix(0.2, 0.6, hash(cell + 1.0));
 
@@ -164,13 +97,21 @@ float nebulaMask(vec3 p){
   return smoothstep(size, 0.0, d);
 }
 
+// ---- SPIRAL GALAXY ----
+float galaxy(vec3 p){
+  float r = length(p.xy);
+  float angle = atan(p.y, p.x);
+
+  float arms = sin(angle * 4.0 + r * 2.0);
+  float core = exp(-r * 0.3);
+
+  return core + arms * 0.3;
+}
+
 void main(){
   vec2 uv = (gl_FragCoord.xy*2.0 - u_res)/u_res.y;
 
-  // ---- PROPER FOV ZOOM ----
-  float fov = mix(1.5, 0.3, clamp(u_zoom,0.0,1.0));
-  vec3 ray = normalize(vec3(uv, fov));
-
+  vec3 ray = normalize(vec3(uv, 1.2));
   ray = rotY(camRot.y) * rotX(camRot.x) * ray;
 
   vec3 ro = camPos;
@@ -178,51 +119,27 @@ void main(){
 
   float density = 0.0;
 
-  for(int i=0;i<6;i++){
+  for(int i=0;i<8;i++){
     float t = float(i) * 12.0;
     vec3 p = ro + rd * t;
 
-    vec3 tp = p * 0.01 + u_seed * 10.0;
+    float blob = nebulaBlob(p);
+    float g = galaxy(p * 0.02);
 
-    float mask = nebulaMask(p);
-
-    density += fbm(tp) * mask * u_densityBoost;
+    density += fbm(p * 0.01) * blob * g * 2.0;
   }
 
-  density /= 6.0;
-  density = smoothstep(0.2,1.0,density);
+  density /= 8.0;
+  density = smoothstep(0.3, 1.0, density);
 
-  vec3 nebColor = u_colorA * pow(density, u_nebulaPower);
-  nebColor += u_colorB * pow(density, u_nebulaPower + 1.0);
+  vec3 col = vec3(0.2,0.1,0.5) * density;
+  col += vec3(0.4,0.2,0.9) * pow(density,2.0);
 
-  // ---- STARS (WORLD SPACE) ----
+  // ---- STARS ----
   vec3 starPos = ro + rd * 300.0;
-  float star = pow(hash(floor(starPos * u_starDensity)), u_starSharpness);
+  float star = pow(hash(floor(starPos * 0.6)), 80.0);
 
-  vec3 col = nebColor + vec3(star);
-
-  // ---- EVENTS ----
-  float distToEvent = length(starPos - u_eventPos);
-
-  if(u_eventType == 1.0){
-    float flash = exp(-distToEvent * 0.02) * u_eventStrength;
-    col += vec3(1.0,0.9,0.7) * flash;
-  }
-
-  if(u_eventType == 2.0){
-    float warp = exp(-distToEvent * 0.01) * u_eventStrength;
-    col += vec3(0.5,0.7,1.0) * warp;
-  }
-
-  if(u_eventType == 3.0){
-    float pulse = sin(distToEvent*0.1 - u_time*5.0) * u_eventStrength;
-    col += vec3(1.0,0.5,1.0) * pulse;
-  }
-
-  if(u_eventType == 4.0){
-    float blast = exp(-distToEvent * 0.005) * u_eventStrength * 3.0;
-    col += vec3(1.0) * blast;
-  }
+  col += vec3(star);
 
   gl_FragColor = vec4(col,1.0);
 }
@@ -251,67 +168,19 @@ const loc=gl.getAttribLocation(prog,"p");
 gl.enableVertexAttribArray(loc);
 gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
 
+// ---- UNIFORMS ----
 const U = name => gl.getUniformLocation(prog,name);
 
-// ---- EVENT SYSTEM ----
-let currentEvent = { type:0, pos:[0,0,0], strength:0 };
-
-function triggerSpaceEvent(type){
-  currentEvent.type = type;
-  currentEvent.pos = [
-    cam.px + (Math.random()-0.5)*200,
-    cam.py + (Math.random()-0.5)*200,
-    cam.pz + (Math.random()-0.5)*200
-  ];
-  currentEvent.strength = 1.5;
-}
-
-window.triggerSpaceEvent = triggerSpaceEvent;
-
-setInterval(()=>{
-  if(!externalSettings?.events) return;
-
-  externalSettings.events.forEach(e=>{
-    if(Math.random() < e.chance){
-      const map = {flash:1, warp:2, pulse:3, supernova:4};
-      triggerSpaceEvent(map[e.type]);
-    }
-  });
-},1000);
-
-function updateEvents(){
-  currentEvent.strength *= 0.93;
-  if(currentEvent.strength < 0.01) currentEvent.type = 0;
-}
-
-// ---- RENDER ----
+// ---- LOOP ----
 let start=Date.now()/1000;
 
 function draw(){
   let t=Date.now()/1000-start;
 
-  updateEvents();
-
-  cam.zoom = Math.max(0, Math.min(1, cam.zoom));
-
   gl.uniform1f(U("u_time"),t);
   gl.uniform2f(U("u_res"),canvas.width,canvas.height);
   gl.uniform3f(U("camPos"),cam.px,cam.py,cam.pz);
   gl.uniform3f(U("camRot"),cam.rx,cam.ry,cam.rz);
-  gl.uniform1f(U("u_zoom"),cam.zoom);
-  gl.uniform1f(U("u_seed"),seed);
-
-  gl.uniform3fv(U("u_colorA"),config.colorA);
-  gl.uniform3fv(U("u_colorB"),config.colorB);
-  gl.uniform1f(U("u_nebulaPower"),config.nebulaPower);
-  gl.uniform1f(U("u_densityBoost"),config.densityBoost);
-
-  gl.uniform1f(U("u_starDensity"),config.starDensity);
-  gl.uniform1f(U("u_starSharpness"),config.starSharpness);
-
-  gl.uniform3fv(U("u_eventPos"),currentEvent.pos);
-  gl.uniform1f(U("u_eventType"),currentEvent.type);
-  gl.uniform1f(U("u_eventStrength"),currentEvent.strength);
 
   gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
   requestAnimationFrame(draw);
