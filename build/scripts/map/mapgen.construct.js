@@ -154,6 +154,8 @@ MapGen._createObject = function (obj) {
 
     label.textContent = obj.meta.displayName;
 
+     label.style.transform = "translateY(-14px)";
+
     el.appendChild(label);
   }
 
