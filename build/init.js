@@ -98,6 +98,9 @@ async function loadScript(url) {
       renderer: !!MapGen.labelRenderer
     });
 
+     // searchbarstart(); // broken for now
+     jumpToCore();
+
   } catch (err) {
     console.error("[Init] fatal error", err);
   }
