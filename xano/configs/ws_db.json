@@ -2,18 +2,38 @@
   "results": "https://ws.mentalisit.myds.me/matches?limit=$$limit$$&page=$$loopcount$$",
   "corporations": "https://ws.mentalisit.myds.me/corps",
   "chunks": {
-    "limit": 10,
-    "size": 500
+    "limit": 25,
+    "size": 1000
   },
   "mapcore": {
   "meta": {
     "id": "core",
-    "displayName": "TMP",
+    "displayName": "C O R E",
     "icon": "https://theredmineword.github.io/map/img_src/star_dark.png"
   },
   "onclick": {
     "embed": "true",
-    "data": {}
+    "data": {
+      "type": "article",
+      "url": "https://theredmineword.github.io/map/index.html",
+      "title": "Astral Alliance - N/A",
+      "description": "“Many Corps. One Mission. Infinite Possibilities.”\nWelcome to Astral Alliance – a united force of few independently-run corporations, banded together to help each other grow, thrive, and conquer the galaxy—at your own pace.\nWhether you’re just starting out or already command a powerful fleet, there’s a place for you in the Alliance. ...",
+      "color": 12063764,
+      "provider": {
+        "name": "DrMineword",
+        "url": "https://theredmineword.github.io/DrMineword"
+      },
+      "thumbnail": {
+        "url": "https://theredmineword.github.io/config/html/portrait_Anomaly.jpg",
+        "proxy_url": "https://images-ext-1.discordapp.net/external/u7v_EIb4MXRN3yno-RoM_80Rmo0H9jBHsusC5JRGQnc/https/theredmineword.github.io/config/html/portrait_Anomaly.jpg",
+        "width": 1920,
+        "height": 609,
+        "content_type": "image/jpeg",
+        "placeholder": "EPcJEoRvgnmWVjaI9Kuaz5o=",
+        "placeholder_version": 1,
+        "flags": 0
+      }
+    }
   },
   "coords": {
     "y": 0,
