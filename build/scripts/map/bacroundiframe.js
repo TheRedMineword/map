@@ -5,7 +5,7 @@ MapGen.initBackground = function (options = {}) {
   }
 
  const {
-    url = "https://theredmineword.github.io/map/build/iframe/spacesky.html",
+    url = "https://theredmineword.github.io/map/build/iframe/spacesky.html?seed=42&config=%7B%22nebulaPower%22%3A3.5%2C%22colorA%22%3A%5B0.1%2C0.0%2C0.3%5D%2C%22colorB%22%3A%5B0.2%2C0.5%2C1.0%5D%7D",
     storageKey = "MapGen:lastDump.camera_pov",
     consoleLog = false,
     zIndex = 0
@@ -49,7 +49,7 @@ var storagebypass = (function(){
 
   
   const iframe = document.createElement("iframe");
-  iframe.src = `${url}?console_log=${consoleLog}&localstoragekey=${storageKey}&bypass=${storagebypass}`;
+  iframe.src = `${url}&console_log=${consoleLog}&localstoragekey=${storageKey}&bypass=${storagebypass}`;
   iframe.style.position = "absolute";
   iframe.style.top = 0;
   iframe.style.left = 0;
