@@ -15,71 +15,66 @@
 const params = new URLSearchParams(location.search);
 const LOG = params.get("console_log") === "true";
 
-// ---- Seed ----
-const seed = parseFloat(params.get("seed")) || Math.random()*1000;
-
-// ---- Config from URL ----
-let config = {
-  nebulaPower: 2.0,
-  starDensity: 2.0,
-  colorA: [0.3,0.2,0.6],
-  colorB: [0.2,0.3,0.8]
-};
-
-try {
-  const cfg = JSON.parse(params.get("config"));
-  Object.assign(config, cfg);
-} catch(e){}
-
-// ---- External settings.json ----
-let externalSettings = null;
-fetch("settings.json")
-  .then(r=>r.json())
-  .then(data=>{
-    externalSettings = data;
-    log("Loaded settings.json", data);
-  });
-
-// ---- Logging ----
 function log(...a){ if(LOG) console.log("[SPACE]",...a); }
 
-// ---- Camera ----
-let cam = { px:0, py:0, pz:0, rx:0, ry:0, rz:0, zoom:1 };
-let lastCamJSON = JSON.stringify(cam);
+// ---- SEED ----
+const seed = parseFloat(params.get("seed")) || Math.random()*1000;
 
-// ---- Storage ----
-const storageKey = params.get("localstoragekey")?.split(".")[0];
-const field = params.get("localstoragekey")?.split(".")[1];
+// ---- CONFIG ----
+let config = {
+  nebulaPower: 2.5,
+  densityBoost: 1.4,
+  colorA: [0.3,0.2,0.6],
+  colorB: [0.2,0.3,0.8],
+  starDensity: 0.6,
+  starSharpness: 120.0
+};
 
-function updateCameraFromStorage(trigger){
-  try{
-    const raw = localStorage.getItem(storageKey);
-    if(!raw) return;
-    const parsed = JSON.parse(raw);
-    const newCam = parsed[field];
-    if(!newCam) return;
+// ---- LOAD settings.json ----
+let externalSettings = null;
 
-    const newJSON = JSON.stringify(newCam);
-    if(newJSON !== lastCamJSON){
-      cam = newCam;
-      lastCamJSON = newJSON;
-      log("Camera updated via", trigger, cam);
-    }
-  } catch(e){
-    log("Storage error", e);
+fetch("settings.json")
+.then(r=>r.json())
+.then(data=>{
+  externalSettings = data;
+  log("settings loaded", data);
+
+  if(data.nebula){
+    config.nebulaPower = data.nebula.power || config.nebulaPower;
+    config.densityBoost = data.nebula.densityBoost || config.densityBoost;
   }
-}
 
-// ---- Listen ----
-window.addEventListener("storage", (e)=>{
-  if(e.key === storageKey){
-    updateCameraFromStorage("storage-event");
-  }
+  pickGradient();
 });
 
-setInterval(()=>updateCameraFromStorage("polling"), 50);
+// ---- HEX → RGB ----
+function hexToRgb(hex){
+  const bigint = parseInt(hex.slice(1),16);
+  return [
+    ((bigint>>16)&255)/255,
+    ((bigint>>8)&255)/255,
+    (bigint&255)/255
+  ];
+}
 
-// ---- WebGL ----
+// ---- Gradient picker ----
+function pickGradient(){
+  if(!externalSettings?.nebula?.gradients) return;
+
+  const g = externalSettings.nebula.gradients[
+    Math.floor(Math.random()*externalSettings.nebula.gradients.length)
+  ];
+
+  config.colorA = hexToRgb(g[0]);
+  config.colorB = hexToRgb(g[1]);
+
+  log("Gradient picked", g);
+}
+
+// ---- CAMERA ----
+let cam = { px:0, py:0, pz:0, rx:0, ry:0, rz:0, zoom:1 };
+
+// ---- WEBGL ----
 const canvas = document.getElementById("c");
 const gl = canvas.getContext("webgl");
 
@@ -91,7 +86,7 @@ function resize(){
 resize();
 window.addEventListener("resize", resize);
 
-// ---- Shaders ----
+// ---- SHADERS ----
 const vert = `
 attribute vec2 p;
 void main(){ gl_Position = vec4(p,0.,1.); }
@@ -106,11 +101,18 @@ uniform vec3 camPos;
 uniform vec3 camRot;
 uniform float u_zoom;
 uniform float u_seed;
-uniform float u_event;
 
 uniform vec3 u_colorA;
 uniform vec3 u_colorB;
 uniform float u_nebulaPower;
+uniform float u_densityBoost;
+
+uniform float u_starDensity;
+uniform float u_starSharpness;
+
+uniform vec3 u_eventPos;
+uniform float u_eventType;
+uniform float u_eventStrength;
 
 float hash(vec3 p){
   p += u_seed;
@@ -154,32 +156,48 @@ void main(){
 
   for(int i=0;i<6;i++){
     p += ray * 6.0;
-
-    // time evolution
     vec3 tp = p*0.02 + u_time*0.02;
-
-    density += fbm(tp);
+    density += fbm(tp) * u_densityBoost;
   }
 
   density /= 6.0;
+  density = smoothstep(0.2,1.0,density);
 
   vec3 nebColor = u_colorA * pow(density, u_nebulaPower);
   nebColor += u_colorB * pow(density, u_nebulaPower + 1.0);
 
-  // stars
   vec3 starPos = camPos + ray * 200.0;
-  float star = pow(hash(floor(starPos*2.0)), 40.0);
+  float star = pow(hash(floor(starPos * u_starDensity)), u_starSharpness);
 
   vec3 col = nebColor + vec3(star);
 
-  // global event flash
-  col += vec3(0.8,0.7,1.0) * u_event;
+  float distToEvent = length(starPos - u_eventPos);
+
+  if(u_eventType == 1.0){
+    float flash = exp(-distToEvent * 0.02) * u_eventStrength;
+    col += vec3(1.0,0.9,0.7) * flash;
+  }
+
+  if(u_eventType == 2.0){
+    float warp = exp(-distToEvent * 0.01) * u_eventStrength;
+    col += vec3(0.5,0.7,1.0) * warp;
+  }
+
+  if(u_eventType == 3.0){
+    float pulse = sin(distToEvent*0.1 - u_time*5.0) * u_eventStrength;
+    col += vec3(1.0,0.5,1.0) * pulse;
+  }
+
+  if(u_eventType == 4.0){
+    float blast = exp(-distToEvent * 0.005) * u_eventStrength * 3.0;
+    col += vec3(1.0) * blast;
+  }
 
   gl_FragColor = vec4(col,1.0);
 }
 `;
 
-// ---- Compile ----
+// ---- COMPILE ----
 function C(t,s){
   let sh=gl.createShader(t);
   gl.shaderSource(sh,s);
@@ -193,7 +211,7 @@ gl.attachShader(prog,C(gl.FRAGMENT_SHADER,frag));
 gl.linkProgram(prog);
 gl.useProgram(prog);
 
-// ---- Quad ----
+// ---- QUAD ----
 const buf=gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER,buf);
 gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
@@ -202,64 +220,41 @@ const loc=gl.getAttribLocation(prog,"p");
 gl.enableVertexAttribArray(loc);
 gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
 
-// ---- Uniforms ----
-const u_time=gl.getUniformLocation(prog,"u_time");
-const u_res=gl.getUniformLocation(prog,"u_res");
-const u_camPos=gl.getUniformLocation(prog,"camPos");
-const u_camRot=gl.getUniformLocation(prog,"camRot");
-const u_zoom=gl.getUniformLocation(prog,"u_zoom");
-const u_seed=gl.getUniformLocation(prog,"u_seed");
-const u_event=gl.getUniformLocation(prog,"u_event");
+// ---- UNIFORMS ----
+const U = name => gl.getUniformLocation(prog,name);
 
-const u_colorA=gl.getUniformLocation(prog,"u_colorA");
-const u_colorB=gl.getUniformLocation(prog,"u_colorB");
-const u_nebulaPower=gl.getUniformLocation(prog,"u_nebulaPower");
+// ---- EVENT SYSTEM ----
+let currentEvent = { type:0, pos:[0,0,0], strength:0 };
 
-// ---- Events ----
-let eventStrength = 0;
-
-// random events
-setInterval(()=>{
-  let chance = 0.05;
-
-  if(externalSettings?.events){
-    externalSettings.events.forEach(e=>{
-      if(Math.random() < e.chance){
-        triggerSpaceEvent(e.type);
-      }
-    });
-  } else {
-    if(Math.random() < chance){
-      eventStrength = 1.0;
-    }
-  }
-}, 1000);
-
-// decay
-function updateEvents(){
-  eventStrength *= 0.92;
+function triggerSpaceEvent(type){
+  currentEvent.type = type;
+  currentEvent.pos = [
+    cam.px + (Math.random()-0.5)*200,
+    cam.py + (Math.random()-0.5)*200,
+    cam.pz + (Math.random()-0.5)*200
+  ];
+  currentEvent.strength = 1.5;
 }
 
-// ---- External trigger ----
-window.triggerSpaceEvent = function(type){
-  if(type === "flash"){
-    eventStrength = 1.5;
-  }
-  if(type === "warp"){
-    cam.zoom = 0.3;
-  }
-  log("Triggered event:", type);
-};
+window.triggerSpaceEvent = triggerSpaceEvent;
 
-// ---- Listen external ----
-window.addEventListener("storage", (e)=>{
-  if(e.key === "space_event"){
-    const ev = JSON.parse(e.newValue);
-    window.triggerSpaceEvent(ev.type);
-  }
-});
+setInterval(()=>{
+  if(!externalSettings?.events) return;
 
-// ---- Render ----
+  externalSettings.events.forEach(e=>{
+    if(Math.random() < e.chance){
+      const map = {flash:1, warp:2, pulse:3, supernova:4};
+      triggerSpaceEvent(map[e.type]);
+    }
+  });
+},1000);
+
+function updateEvents(){
+  currentEvent.strength *= 0.93;
+  if(currentEvent.strength < 0.01) currentEvent.type = 0;
+}
+
+// ---- RENDER ----
 let start=Date.now()/1000;
 
 function draw(){
@@ -267,17 +262,24 @@ function draw(){
 
   updateEvents();
 
-  gl.uniform1f(u_time,t);
-  gl.uniform2f(u_res,canvas.width,canvas.height);
-  gl.uniform3f(u_camPos,cam.px,cam.py,cam.pz);
-  gl.uniform3f(u_camRot,cam.rx,cam.ry,cam.rz);
-  gl.uniform1f(u_zoom,cam.zoom || 1);
-  gl.uniform1f(u_seed,seed);
-  gl.uniform1f(u_event,eventStrength);
+  gl.uniform1f(U("u_time"),t);
+  gl.uniform2f(U("u_res"),canvas.width,canvas.height);
+  gl.uniform3f(U("camPos"),cam.px,cam.py,cam.pz);
+  gl.uniform3f(U("camRot"),cam.rx,cam.ry,cam.rz);
+  gl.uniform1f(U("u_zoom"),cam.zoom||1);
+  gl.uniform1f(U("u_seed"),seed);
 
-  gl.uniform3fv(u_colorA,config.colorA);
-  gl.uniform3fv(u_colorB,config.colorB);
-  gl.uniform1f(u_nebulaPower,config.nebulaPower);
+  gl.uniform3fv(U("u_colorA"),config.colorA);
+  gl.uniform3fv(U("u_colorB"),config.colorB);
+  gl.uniform1f(U("u_nebulaPower"),config.nebulaPower);
+  gl.uniform1f(U("u_densityBoost"),config.densityBoost);
+
+  gl.uniform1f(U("u_starDensity"),config.starDensity);
+  gl.uniform1f(U("u_starSharpness"),config.starSharpness);
+
+  gl.uniform3fv(U("u_eventPos"),currentEvent.pos);
+  gl.uniform1f(U("u_eventType"),currentEvent.type);
+  gl.uniform1f(U("u_eventStrength"),currentEvent.strength);
 
   gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
   requestAnimationFrame(draw);
