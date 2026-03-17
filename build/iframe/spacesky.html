@@ -3,199 +3,429 @@
 <head>
 <meta charset="UTF-8" />
 <title>Cinematic Procedural Space</title>
+
 <style>
-  body,html { margin:0; overflow:hidden; background:black; }
-  canvas { display:block; }
+body,html{
+  margin:0;
+  overflow:hidden;
+  background:black;
+}
+canvas{
+  display:block;
+}
 </style>
+
 </head>
 <body>
+
 <canvas id="c"></canvas>
 
 <script>
-// ---- CAMERA ----
-let cam = { px:0, py:0, pz:0, rx:0, ry:0, rz:0 };
 
-// TEMP movement (remove later)
-setInterval(()=> cam.pz += 0.15, 16);
+/* =========================================
+   PARAMS + LOGGING
+========================================= */
 
-// ---- WEBGL ----
+const params = new URLSearchParams(location.search);
+
+const LOG = params.get("console_log") === "true";
+const storageKey = params.get("localstoragekey")?.split(".")[0];
+const field = params.get("localstoragekey")?.split(".")[1];
+
+const seed = Number(params.get("seed") || 42);
+
+function log(...a){
+  if(LOG) console.log("[SPACE]", ...a);
+}
+
+log("Seed:", seed);
+log("Storage key:", storageKey);
+log("Field:", field);
+
+
+/* =========================================
+   CAMERA
+========================================= */
+
+let cam = {
+  px:0,
+  py:0,
+  pz:0,
+  rx:0,
+  ry:0,
+  rz:0,
+  zoom:1
+};
+
+let lastCamJSON = JSON.stringify(cam);
+
+try{
+
+  const raw = localStorage.getItem(storageKey);
+
+  if(raw){
+
+    const parsed = JSON.parse(raw);
+    cam = parsed[field];
+
+    lastCamJSON = JSON.stringify(cam);
+
+    log("Loaded camera from storage:", cam);
+  }
+
+}catch(e){
+
+  log("Storage load error:", e);
+
+}
+
+
+/* =========================================
+   WEBGL SETUP
+========================================= */
+
 const canvas = document.getElementById("c");
 const gl = canvas.getContext("webgl");
 
 function resize(){
+
   canvas.width = innerWidth;
   canvas.height = innerHeight;
+
   gl.viewport(0,0,canvas.width,canvas.height);
+
+  log("Resize:", canvas.width, canvas.height);
+
 }
+
 resize();
 window.addEventListener("resize", resize);
 
-// ---- SHADERS ----
+
+/* =========================================
+   SHADERS
+========================================= */
+
 const vert = `
 attribute vec2 p;
-void main(){ gl_Position = vec4(p,0.,1.); }
+void main(){
+  gl_Position = vec4(p,0.,1.);
+}
 `;
 
+
 const frag = `
+
 precision highp float;
 
 uniform vec2 u_res;
 uniform vec3 camPos;
 uniform vec3 camRot;
+uniform float u_seed;
 
-// ---- HASH ----
+
+/* =========================
+   HASH
+========================= */
+
 float hash(vec3 p){
+
+  p += u_seed;
+
   p = fract(p * 0.3183099 + .1);
   p *= 17.0;
+
   return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
 }
 
-// ---- NOISE ----
+
+/* =========================
+   NOISE
+========================= */
+
 float noise(vec3 x){
+
   vec3 i = floor(x);
   vec3 f = fract(x);
+
   f = f*f*(3.0-2.0*f);
 
-  float n = mix(mix(mix(hash(i), hash(i+vec3(1,0,0)), f.x),
-                    mix(hash(i+vec3(0,1,0)), hash(i+vec3(1,1,0)), f.x), f.y),
-                mix(mix(hash(i+vec3(0,0,1)), hash(i+vec3(1,0,1)), f.x),
-                    mix(hash(i+vec3(0,1,1)), hash(i+vec3(1,1,1)), f.x), f.y), f.z);
+  float n =
+    mix(
+      mix(
+        mix(hash(i), hash(i+vec3(1,0,0)), f.x),
+        mix(hash(i+vec3(0,1,0)), hash(i+vec3(1,1,0)), f.x),
+        f.y
+      ),
+      mix(
+        mix(hash(i+vec3(0,0,1)), hash(i+vec3(1,0,1)), f.x),
+        mix(hash(i+vec3(0,1,1)), hash(i+vec3(1,1,1)), f.x),
+        f.y
+      ),
+      f.z
+    );
+
   return n;
 }
 
-// ---- FBM ----
+
+/* =========================
+   FBM
+========================= */
+
 float fbm(vec3 p){
-  float f=0.0;
-  f+=noise(p)*.5; p*=2.0;
-  f+=noise(p)*.25; p*=2.0;
-  f+=noise(p)*.125;
+
+  float f = 0.0;
+
+  f += noise(p) * .5;   p *= 2.0;
+  f += noise(p) * .25;  p *= 2.0;
+  f += noise(p) * .125;
+
   return f;
+
 }
 
-// ---- ROT ----
-mat3 rotY(float a){ return mat3(cos(a),0.,sin(a), 0.,1.,0., -sin(a),0.,cos(a)); }
-mat3 rotX(float a){ return mat3(1.,0.,0., 0.,cos(a),-sin(a), 0.,sin(a),cos(a)); }
 
-// ---- NEBULA BLOBS ----
-float nebulaBlob(vec3 p){
-  vec3 cell = floor(p * 0.04);
-  float h = hash(cell);
+/* =========================
+   ROTATION
+========================= */
 
-  if(h < 0.55) return 0.0;
+mat3 rotY(float a){
 
-  float size = mix(0.3, 0.8, hash(cell + 1.0));
+  return mat3(
+    cos(a),0.,sin(a),
+    0.,1.,0.,
+    -sin(a),0.,cos(a)
+  );
 
-  vec3 local = fract(p * 0.04) - 0.5;
-  float d = length(local);
-
-  return smoothstep(size, 0.0, d);
 }
 
-// ---- GALAXY ----
-float galaxy(vec3 p){
-  float r = length(p.xy);
-  float angle = atan(p.y, p.x);
+mat3 rotX(float a){
 
-  float arms = sin(angle * 4.0 + r * 2.5);
-  float core = exp(-r * 0.25);
+  return mat3(
+    1.,0.,0.,
+    0.,cos(a),-sin(a),
+    0.,sin(a),cos(a)
+  );
 
-  return core + arms * 0.6;
 }
 
-void main(){
-  vec2 uv = (gl_FragCoord.xy*2.0 - u_res)/u_res.y;
 
-  vec3 ray = normalize(vec3(uv, 1.2));
-  ray = rotY(camRot.y) * rotX(camRot.x) * ray;
+/* =========================
+   NEBULA
+========================= */
 
-  vec3 ro = camPos;
-  vec3 rd = ray;
+float nebula(vec3 p){
 
   float density = 0.0;
 
-  for(int i=0;i<10;i++){
-    float t = float(i) * 10.0;
-    vec3 p = ro + rd * t;
+  for(int i=0;i<6;i++){
 
-    float blob = nebulaBlob(p);
-    float g = galaxy(p * 0.02);
+    p += 8.0;
 
-    density += fbm(p * 0.01) * blob * g * 2.5;
+    density += fbm(p * 0.02);
+
   }
 
-  density /= 10.0;
+  density /= 6.0;
 
-  // ---- VISIBILITY BOOST ----
-  density = smoothstep(0.15, 0.8, density);
-  density = pow(density, 0.6);
+  return density;
 
-  // ---- CINEMATIC COLOR ----
+}
+
+
+/* =========================
+   MAIN
+========================= */
+
+void main(){
+
+  vec2 uv = (gl_FragCoord.xy*2.0 - u_res) / u_res.y;
+
+  vec3 ray = normalize(vec3(uv,1.3));
+
+  ray = rotY(camRot.y) * rotX(camRot.x) * ray;
+
+  vec3 ro = camPos * 0.25;
+  vec3 rd = ray;
+
+  vec3 p = ro + rd * 50.0;
+
+  float density = nebula(p);
+
+
+  /* ----- color ----- */
+
   vec3 col = vec3(0.0);
 
-  // deep space base
   col += vec3(0.05,0.08,0.15) * density;
 
-  // purple / blue
   col += vec3(0.4,0.2,0.9) * pow(density,1.5);
 
-  // warm glow (important!)
-  col += vec3(1.0,0.5,0.2) * pow(density,3.0);
+  col += vec3(0.2,0.3,1.0) * pow(density,2.5) * 0.7;
 
-  // pink accents
-  col += vec3(0.8,0.3,0.6) * pow(density,2.0);
+  col += vec3(1.0,0.5,0.2) * pow(density,2.0) * 0.4;
 
-  // emission glow
-  col += density * 0.25;
 
-  // ---- STARS (stable) ----
-  vec3 starPos = ro + rd * 300.0;
-  vec3 cell = floor(starPos * 0.5);
+  /* ----- stable stars ----- */
+
+  vec3 starPos = ro + rd * 250.0;
+
+  vec3 cell = floor(starPos * 0.6);
 
   float star = hash(cell);
-  star = step(0.995, star);
 
-  col += vec3(star);
+  star = smoothstep(0.997,1.0,star);
+
+  col += vec3(star) * 0.7;
+
 
   gl_FragColor = vec4(col,1.0);
+
 }
+
 `;
 
-// ---- COMPILE ----
-function C(t,s){
-  let sh=gl.createShader(t);
-  gl.shaderSource(sh,s);
+
+/* =========================================
+   SHADER COMPILE
+========================================= */
+
+function C(type,src){
+
+  let sh = gl.createShader(type);
+
+  gl.shaderSource(sh,src);
   gl.compileShader(sh);
+
+  if(!gl.getShaderParameter(sh, gl.COMPILE_STATUS)){
+    console.error(gl.getShaderInfoLog(sh));
+  }
+
   return sh;
+
 }
 
-const prog=gl.createProgram();
-gl.attachShader(prog,C(gl.VERTEX_SHADER,vert));
-gl.attachShader(prog,C(gl.FRAGMENT_SHADER,frag));
+
+const prog = gl.createProgram();
+
+gl.attachShader(prog, C(gl.VERTEX_SHADER, vert));
+gl.attachShader(prog, C(gl.FRAGMENT_SHADER, frag));
+
 gl.linkProgram(prog);
 gl.useProgram(prog);
 
-// ---- QUAD ----
-const buf=gl.createBuffer();
-gl.bindBuffer(gl.ARRAY_BUFFER,buf);
-gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
 
-const loc=gl.getAttribLocation(prog,"p");
+/* =========================================
+   QUAD
+========================================= */
+
+const buf = gl.createBuffer();
+
+gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+
+gl.bufferData(
+  gl.ARRAY_BUFFER,
+  new Float32Array([-1,-1,1,-1,-1,1,1,1]),
+  gl.STATIC_DRAW
+);
+
+const loc = gl.getAttribLocation(prog,"p");
+
 gl.enableVertexAttribArray(loc);
 gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
 
-// ---- UNIFORMS ----
+
+/* =========================================
+   UNIFORMS
+========================================= */
+
 const U = n => gl.getUniformLocation(prog,n);
 
-// ---- LOOP ----
+
+/* =========================================
+   CAMERA SYNC
+========================================= */
+
+function updateCameraFromStorage(trigger){
+
+  try{
+
+    const raw = localStorage.getItem(storageKey);
+
+    if(!raw) return;
+
+    const parsed = JSON.parse(raw);
+    const newCam = parsed[field];
+
+    if(!newCam) return;
+
+    const newJSON = JSON.stringify(newCam);
+
+    if(newJSON !== lastCamJSON){
+
+      cam = newCam;
+
+      lastCamJSON = newJSON;
+
+      log("Camera updated via", trigger, cam);
+
+    }
+
+  }catch(e){
+
+    log("Camera read error:", e);
+
+  }
+
+}
+
+
+window.addEventListener("storage", e=>{
+  if(e.key === storageKey){
+    updateCameraFromStorage("storage-event");
+  }
+});
+
+
+setInterval(()=>{
+  updateCameraFromStorage("polling");
+},80);
+
+
+/* =========================================
+   RENDER LOOP
+========================================= */
+
 function draw(){
-  gl.uniform2f(U("u_res"),canvas.width,canvas.height);
-  gl.uniform3f(U("camPos"),cam.px,cam.py,cam.pz);
-  gl.uniform3f(U("camRot"),cam.rx,cam.ry,cam.rz);
+
+  gl.uniform2f(U("u_res"), canvas.width, canvas.height);
+
+  gl.uniform3f(U("camPos"),
+    cam.px,
+    cam.py,
+    cam.pz * 0.25   /* slower zoom */
+  );
+
+  gl.uniform3f(U("camRot"),
+    cam.rx,
+    cam.ry,
+    cam.rz
+  );
+
+  gl.uniform1f(U("u_seed"), seed);
 
   gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+
   requestAnimationFrame(draw);
+
 }
+
 draw();
+
+log("Renderer started");
+
 </script>
+
 </body>
 </html>
