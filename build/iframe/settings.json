@@ -1,7 +1,7 @@
 {
   "nebula": {
-    "power": 2.5,
-    "densityBoost": 1.4,
+    "power": 2.8,
+    "densityBoost": 1.6,
 
     "colors": [
       "#2a1b5f",
@@ -15,7 +15,8 @@
     "gradients": [
       ["#2a1b5f", "#8a6cff"],
       ["#1f3b5f", "#5fd0ff"],
-      ["#3b1f3f", "#ff6ccf"]
+      ["#3b1f3f", "#ff6ccf"],
+      ["#000000", "#4444ff"]
     ]
   },
 
@@ -25,29 +26,9 @@
   },
 
   "events": [
-    {
-      "type": "flash",
-      "chance": 0.08,
-      "color": "#fff2cc",
-      "power": 1.5
-    },
-    {
-      "type": "warp",
-      "chance": 0.04,
-      "color": "#88ccff",
-      "power": 1.2
-    },
-    {
-      "type": "pulse",
-      "chance": 0.06,
-      "color": "#ff88ff",
-      "power": 1.0
-    },
-    {
-      "type": "supernova",
-      "chance": 0.01,
-      "color": "#ffffff",
-      "power": 3.0
-    }
+    { "type": "flash", "chance": 0.08 },
+    { "type": "warp", "chance": 0.04 },
+    { "type": "pulse", "chance": 0.06 },
+    { "type": "supernova", "chance": 0.01 }
   ]
 }
