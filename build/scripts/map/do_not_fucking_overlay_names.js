@@ -1,12 +1,12 @@
 MapGen._resolveLabelOverlap = function () {
 
   const entries = Array.from(MapGen.objects.values());
-  const threshold = 40; // distance where labels start offsetting
+  const threshold = 40;
+  const BASE_OFFSET = -14;
 
   for (let i = 0; i < entries.length; i++) {
 
     const a = entries[i];
-
     let offset = 0;
 
     for (let j = 0; j < entries.length; j++) {
@@ -20,14 +20,19 @@ MapGen._resolveLabelOverlap = function () {
 
       const dist = Math.sqrt(dx*dx + dy*dy);
 
-      if (dist < threshold) {
-        offset += 14;
-      }
+      if (dist < threshold) offset += 14;
     }
 
-    const label = a.node.children[0];
-    if (label?.element) {
-      label.element.style.transform = `translateY(${offset}px)`;
+    const cssObj = a.node.children[0];
+    const el = cssObj?.element;
+
+    if (!el) continue;
+
+    const label = el.querySelector(".mapgen-label");
+
+    if (label) {
+      label.style.transform =
+        `translateY(${BASE_OFFSET + offset}px)`;
     }
 
   }
