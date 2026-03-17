@@ -32,11 +32,11 @@ MapGen.animate = function (time = performance.now()) {
 });
 
 
-try {
-  MapGen._resolveLabelOverlap();
-} catch (err) {
-  console.warn("[MapGen] label overlap resolver failed", err);
-}
+//try {
+//  MapGen._resolveLabelOverlap();
+//} catch (err) {
+  //console.warn("[MapGen] label overlap resolver failed", err);
+//}
    
 const delta = (time - MapGen._lastTime) / 1000;
 MapGen._lastTime = time;
