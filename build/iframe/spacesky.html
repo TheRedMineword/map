@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>Procedural Space</title>
+<title>Cinematic Procedural Space</title>
 <style>
   body,html { margin:0; overflow:hidden; background:black; }
   canvas { display:block; }
@@ -12,16 +12,11 @@
 <canvas id="c"></canvas>
 
 <script>
-const params = new URLSearchParams(location.search);
-const LOG = params.get("console_log") === "true";
-
-function log(...a){ if(LOG) console.log("[SPACE]",...a); }
-
 // ---- CAMERA ----
 let cam = { px:0, py:0, pz:0, rx:0, ry:0, rz:0 };
 
-// DEBUG movement (REMOVE later)
-setInterval(()=> cam.pz += 0.2, 16);
+// TEMP movement (remove later)
+setInterval(()=> cam.pz += 0.15, 16);
 
 // ---- WEBGL ----
 const canvas = document.getElementById("c");
@@ -44,7 +39,6 @@ void main(){ gl_Position = vec4(p,0.,1.); }
 const frag = `
 precision highp float;
 
-uniform float u_time;
 uniform vec2 u_res;
 uniform vec3 camPos;
 uniform vec3 camRot;
@@ -84,28 +78,28 @@ mat3 rotX(float a){ return mat3(1.,0.,0., 0.,cos(a),-sin(a), 0.,sin(a),cos(a)); 
 
 // ---- NEBULA BLOBS ----
 float nebulaBlob(vec3 p){
-  vec3 cell = floor(p * 0.05);
+  vec3 cell = floor(p * 0.04);
   float h = hash(cell);
 
-  if(h < 0.75) return 0.0;
+  if(h < 0.55) return 0.0;
 
-  float size = mix(0.2, 0.6, hash(cell + 1.0));
+  float size = mix(0.3, 0.8, hash(cell + 1.0));
 
-  vec3 local = fract(p * 0.05) - 0.5;
+  vec3 local = fract(p * 0.04) - 0.5;
   float d = length(local);
 
   return smoothstep(size, 0.0, d);
 }
 
-// ---- SPIRAL GALAXY ----
+// ---- GALAXY ----
 float galaxy(vec3 p){
   float r = length(p.xy);
   float angle = atan(p.y, p.x);
 
-  float arms = sin(angle * 4.0 + r * 2.0);
-  float core = exp(-r * 0.3);
+  float arms = sin(angle * 4.0 + r * 2.5);
+  float core = exp(-r * 0.25);
 
-  return core + arms * 0.3;
+  return core + arms * 0.6;
 }
 
 void main(){
@@ -119,25 +113,46 @@ void main(){
 
   float density = 0.0;
 
-  for(int i=0;i<8;i++){
-    float t = float(i) * 12.0;
+  for(int i=0;i<10;i++){
+    float t = float(i) * 10.0;
     vec3 p = ro + rd * t;
 
     float blob = nebulaBlob(p);
     float g = galaxy(p * 0.02);
 
-    density += fbm(p * 0.01) * blob * g * 2.0;
+    density += fbm(p * 0.01) * blob * g * 2.5;
   }
 
-  density /= 8.0;
-  density = smoothstep(0.3, 1.0, density);
+  density /= 10.0;
 
-  vec3 col = vec3(0.2,0.1,0.5) * density;
-  col += vec3(0.4,0.2,0.9) * pow(density,2.0);
+  // ---- VISIBILITY BOOST ----
+  density = smoothstep(0.15, 0.8, density);
+  density = pow(density, 0.6);
 
-  // ---- STARS ----
+  // ---- CINEMATIC COLOR ----
+  vec3 col = vec3(0.0);
+
+  // deep space base
+  col += vec3(0.05,0.08,0.15) * density;
+
+  // purple / blue
+  col += vec3(0.4,0.2,0.9) * pow(density,1.5);
+
+  // warm glow (important!)
+  col += vec3(1.0,0.5,0.2) * pow(density,3.0);
+
+  // pink accents
+  col += vec3(0.8,0.3,0.6) * pow(density,2.0);
+
+  // emission glow
+  col += density * 0.25;
+
+  // ---- STARS (stable) ----
   vec3 starPos = ro + rd * 300.0;
-  float star = pow(hash(floor(starPos * 0.6)), 80.0);
+  vec3 cell = floor(starPos * 0.5);
+
+  float star = hash(cell);
+  star = step(0.995, star);
 
   col += vec3(star);
 
@@ -169,15 +184,10 @@ gl.enableVertexAttribArray(loc);
 gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
 
 // ---- UNIFORMS ----
-const U = name => gl.getUniformLocation(prog,name);
+const U = n => gl.getUniformLocation(prog,n);
 
 // ---- LOOP ----
-let start=Date.now()/1000;
-
 function draw(){
-  let t=Date.now()/1000-start;
-
-  gl.uniform1f(U("u_time"),t);
   gl.uniform2f(U("u_res"),canvas.width,canvas.height);
   gl.uniform3f(U("camPos"),cam.px,cam.py,cam.pz);
   gl.uniform3f(U("camRot"),cam.rx,cam.ry,cam.rz);
