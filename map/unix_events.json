@@ -1,0 +1,29 @@
+{
+    "elements": [
+        {
+            "duration": {
+                "start": "0",
+                "end": "1"
+            },
+            "url": "https://theredmineword.github.io/map/map/elements/shard_tets.json?v=2"
+        }
+    ],
+    "music": [
+        {
+            "duration": {
+                "start": "0",
+                "end": "1"
+            },
+            "url": "https://theredmineword.github.io/map/map/elements/Sky%20COTL%20-%20Red%20Shard%20event%20OST.mp3"
+        }
+    ],
+    "scripts": [
+        {
+            "duration": {
+                "start": "0",
+                "end": "1"
+            },
+            "url": "data:text/javascript;base64,KGZ1bmN0aW9uIGFkZERhcmtSZWRHbGludCgpIHsNCiAgICBjb25zdCBvdmVybGF5ID0gZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgnZGl2Jyk7DQogICAgb3ZlcmxheS5zdHlsZS5wb3NpdGlvbiA9ICdmaXhlZCc7DQogICAgb3ZlcmxheS5zdHlsZS50b3AgPSAnMCc7DQogICAgb3ZlcmxheS5zdHlsZS5sZWZ0ID0gJzAnOw0KICAgIG92ZXJsYXkuc3R5bGUud2lkdGggPSAnMTAwdncnOw0KICAgIG92ZXJsYXkuc3R5bGUuaGVpZ2h0ID0gJzEwMHZoJzsNCiAgICBvdmVybGF5LnN0eWxlLnBvaW50ZXJFdmVudHMgPSAnbm9uZSc7IC8vIHNvIGl0IGRvZXNu4oCZdCBibG9jayBjbGlja3MNCiAgICBvdmVybGF5LnN0eWxlLmJhY2tncm91bmQgPSAncmdiYSg4MCwgMCwgMCwgMC4zKSc7IC8vIGRhcmsgcmVkIHdpdGggMzAlIG9wYWNpdHkNCiAgICBvdmVybGF5LnN0eWxlLnpJbmRleCA9ICc5OTk5OTknOyAvLyBzdGF5IG9uIHRvcCBvZiBldmVyeXRoaW5nDQogICAgb3ZlcmxheS5zdHlsZS5taXhCbGVuZE1vZGUgPSAnbXVsdGlwbHknOyAvLyBmb3IgYSBzdHJvbmdlciAiZ2xpbnQiIGVmZmVjdCAob3B0aW9uYWwpDQogICAgZG9jdW1lbnQuYm9keS5hcHBlbmRDaGlsZChvdmVybGF5KTsNCn0pKCk7DQpmdW5jdGlvbiBzaG93RXZlbnRCYW5uZXIodGV4dCwgY29sb3IgPSAnY3JpbXNvbicpIHsNCiAgICBjb25zdCBiYW5uZXIgPSBkb2N1bWVudC5jcmVhdGVFbGVtZW50KCdkaXYnKTsNCiAgICBiYW5uZXIudGV4dENvbnRlbnQgPSB0ZXh0Ow0KICAgIGJhbm5lci5zdHlsZS5wb3NpdGlvbiA9ICdmaXhlZCc7DQogICAgYmFubmVyLnN0eWxlLnRvcCA9ICcyMHB4JzsNCiAgICBiYW5uZXIuc3R5bGUubGVmdCA9ICc1MCUnOw0KICAgIGJhbm5lci5zdHlsZS50cmFuc2Zvcm0gPSAndHJhbnNsYXRlWCgtNTAlKSc7DQogICAgYmFubmVyLnN0eWxlLmJhY2tncm91bmQgPSBjb2xvcjsNCiAgICBiYW5uZXIuc3R5bGUuY29sb3IgPSAnd2hpdGUnOw0KICAgIGJhbm5lci5zdHlsZS5wYWRkaW5nID0gJzEwcHggMjBweCc7DQogICAgYmFubmVyLnN0eWxlLmJvcmRlclJhZGl1cyA9ICc4cHgnOw0KICAgIGJhbm5lci5zdHlsZS5mb250U2l6ZSA9ICcxOHB4JzsNCiAgICBiYW5uZXIuc3R5bGUuekluZGV4ID0gJzEwMDAwMDAnOw0KICAgIGJhbm5lci5zdHlsZS5ib3hTaGFkb3cgPSAnMCAwIDEwcHggYmxhY2snOw0KICAgIGRvY3VtZW50LmJvZHkuYXBwZW5kQ2hpbGQoYmFubmVyKTsNCg0KICAgIHNldFRpbWVvdXQoKCkgPT4gYmFubmVyLnJlbW92ZSgpLCA2MDAwKTsNCn0NCnNob3dFdmVudEJhbm5lcigiVGhlIERhcmtuZXNzIEhhdmUgRmFsbGVuISEiKTs="
+        }
+    ]
+}

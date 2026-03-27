@@ -1,0 +1,8 @@
+{
+  "movement": {
+    "cycle_zero_start_timestamp": 0,
+ "old-cycle_duration_ms": 732000,   
+"cycle_duration_ms": 3600000,
+    "rotation_speed_formula": "function speed(y) { return 1 / (1 + y * 0.1); }"
+  }
+}

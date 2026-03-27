@@ -1,0 +1,24 @@
+{
+    "id": "e65e9a7af457b9d367f500a51d883df58e35d00ef6cfa404dc13f274c18c2d17",
+    "seed_id": "e65e9a7af457b9d367f500a51d883df58e35d00ef6cfa404dc13f274c18c2d17",
+    "rotation_cycle_duration": 35.02,
+    "min_y": "0",
+    "max_y": "45000",
+    "icon_url": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjIuODggMTIyLjg4Ij48ZGVmcz48c3R5bGU+LmF7ZmlsbDojMWQ3YWQ5O2ZpbGwtcnVsZTpldmVub2RkO30uYntmaWxsOiNmZmMyMjA7fTwvc3R5bGU+PC9kZWZzPjxwYXRoIGNsYXNzPSJhIiBkPSJNMzguMjQsMGg0Ni40YTM4LjM2LDM4LjM2LDAsMCwxLDM4LjI0LDM4LjI0djQ2LjRhMzguMzYsMzguMzYsMCwwLDEtMzguMjQsMzguMjRIMzguMjRBMzguMzYsMzguMzYsMCwwLDEsMCw4NC42NFYzOC4yNEEzOC4zNiwzOC4zNiwwLDAsMSwzOC4yNCwwWiIvPjxwYXRoIGNsYXNzPSJiIiBkPSJNNjEuNDMsMjAuODJjLTMuMDksMC01LjU0LDEuNzMtNS41NCwzLjgzTDU3Ljc3LDQ1LjljLjIsMS4yOCwxLjc3LDIuMjcsMy42NywyLjI3czMuNDYtMSwzLjY3LTIuMjdMNjcsMjQuNjVjMC0yLjEtMi40Ny0zLjgyLTUuNTYtMy44MlptLTMwLjU4LDE3YTYsNiwwLDAsMC00LjU4LDMuMjZjLTEuNTUsMi42OC0xLjI4LDUuNjcuNTMsNi43MmwxOS4zNCw5YzEuMjEuNDUsMi44NS0uNDEsMy44LTJoMGMxLTEuNjUuODgtMy41LS4xMi00LjMyTDMyLjM1LDM4LjI0YTIuODYsMi44NiwwLDAsMC0xLjUtLjM3Wm02MS4xNywwYTIuODYsMi44NiwwLDAsMC0xLjUuMzdMNzMuMDUsNTAuNDljLTEsLjgyLTEuMDcsMi42Ny0uMTIsNC4zMmgwYy45NSwxLjY0LDIuNTksMi41LDMuOCwybDE5LjM0LTljMS44My0xLjA1LDIuMDktNCwuNTUtNi43MkE2LDYsMCwwLDAsOTIsMzcuODdabS00NS4xNSwyOGExLjczLDEuNzMsMCwwLDAtLjcyLjEyTDI2LjgxLDc1Yy0xLjgyLDEuMDYtMi4wOSw0LS41NCw2LjczczQuMjcsMy45NCw2LjA4LDIuODlMNDkuODIsNzIuNGMxLS44MywxLjA4LTIuNjguMTMtNC4zMmgwYTMuOTQsMy45NCwwLDAsMC0zLjA4LTIuMTdabTI5LjE0LDBhMy45NCwzLjk0LDAsMCwwLTMuMDgsMi4xN2gwYy0xLDEuNjQtLjg3LDMuNDkuMTMsNC4zMkw5MC41Myw4NC42NGMxLjgxLDEsNC41My0uMjIsNi4wOS0yLjg5czEuMjgtNS42Ny0uNTUtNi43M0w3Ni43Myw2NmExLjc2LDEuNzYsMCwwLDAtLjcyLS4xMlpNNjEuNDMsNzQuNzJjLTEuODksMC0zLjQ2LDEtMy42NiwyLjI2TDU1Ljg5LDk4LjIzYzAsMi4xLDIuNDYsMy44Myw1LjU1LDMuODNTNjcsMTAwLjMzLDY3LDk4LjIzTDY1LjExLDc3Yy0uMjEtMS4yOC0xLjc3LTIuMjYtMy42Ny0yLjI2WiIvPjwvc3ZnPg==",
+    "display_name": "brightknight",
+    "aura_color": "#00ffff",
+    "effects": [],
+    "interaction": {
+        "clickable": true,
+        "data": {
+            "title": "Space Walmart Announces",
+            "color": 148472,
+            "video": {
+                "url": [
+                    "https://theredmineword.github.io/map/api/src/memes/Walmart%20Brainrot%20Ad.mp4"
+                ]
+            }
+        }
+    },
+    "parent_id": "core_001"
+}

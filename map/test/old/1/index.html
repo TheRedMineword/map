@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Galaxy Map 2D Orbit + Spin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  body, html { margin:0; padding:0; overflow:hidden; background:#000; font-family:sans-serif; }
+  #infoBox {
+    position: fixed; bottom: 20px; left: 20px;
+    background: rgba(0,0,0,0.75); color: #fff;
+    padding: 10px 15px; border-radius: 5px;
+    font-size: 14px; max-width: 300px;
+    display: none; pointer-events: none; user-select: none;
+  }
+  .label {
+    color: white;
+    background: rgba(0,0,0,0.6);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 13px;
+    pointer-events: none;
+    user-select: none;
+    white-space: nowrap;
+    transform-origin: center center;
+  }
+  #loadingOverlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.95);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2em;
+    z-index: 9999;
+    transition: opacity 0.4s;
+  }
+  #loadingOverlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<div id="loadingOverlay">Loading galaxy map...</div>
+<div id="infoBox"></div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.152.2/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+let camera, scene, renderer, labelRenderer;
+let objects = {};
+let clock = new THREE.Clock();
+let infoBox = document.getElementById('infoBox');
+let followObject = null;
+let followStartTime = 0;
+const FOLLOW_DURATION = 4000;
+
+let isDragging = false;
+let prevMousePos = {x:0,y:0};
+
+const galaxyCenter = new THREE.Vector2(0, 0);
+
+// Helper: seeded hash to number
+function hashStringToNumber(str) {
+  let hash = 0;
+  for (let i=0; i<str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
+
+// Generate orbit radius and base angle for object based on seed/id
+function generateOrbitParams(seed) {
+  const hash = hashStringToNumber(seed);
+  const coreRadius = 100; // keep core radius smaller so orbits start outside core
+  const minOrbitRadius = coreRadius + 50;
+  const maxOrbitRadius = 600;
+
+  // radius distributed between min and max by hash
+  const radius = minOrbitRadius + (hash % (maxOrbitRadius - minOrbitRadius));
+
+  // angle offset in radians (0 to 2pi)
+  const angleOffset = ((hash >> 8) % 360) * Math.PI / 180;
+
+  return {radius, angleOffset};
+}
+
+function vecToStr(vec) {
+  return `x: ${vec.x.toFixed(1)}, y: ${vec.y.toFixed(1)}, z: ${vec.z.toFixed(1)}`;
+}
+
+async function fetchJSON(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Failed to fetch ' + url);
+  return await res.json();
+}
+
+async function loadData() {
+  const configUrl = 'https://theredmineword.github.io/map/map/config.json?jam=' + Math.random();
+  const galaxyConfig = await fetchJSON(configUrl);
+
+  const elementsUrls = await fetchJSON(galaxyConfig.galaxy.elements + '?jam=' + Math.random());
+  const elementsArrays = await Promise.all(elementsUrls.map(url => fetchJSON(url + '?jam=' + Math.random())));
+  let elementsData = elementsArrays.flat();
+
+  // Filter elements only orbiting core or core close orbit
+  const validParents = new Set([galaxyConfig.core_object.data.id]);
+  galaxyConfig.core_object.close_orbit.forEach(o => validParents.add(o.id));
+  elementsData = elementsData.filter(e => e.parent_id && validParents.has(e.parent_id));
+
+  // Compose final list: core + close orbit + elements
+  const allObjects = [];
+  allObjects.push({
+    ...galaxyConfig.core_object.data,
+    seed_id: galaxyConfig.core_object.data.seed_id || 'core_0001',
+    display_name: galaxyConfig.core_object.data.display_name || 'Galactic Core',
+    position: new THREE.Vector3(0,0,0),
+    rotation_cycle_duration: 0,
+    icon_url: galaxyConfig.core_object.data.icon_url,
+    isCore: true,
+  });
+  galaxyConfig.core_object.close_orbit.forEach(obj => {
+    obj.isCore = false;
+    allObjects.push(obj);
+  });
+  elementsData.forEach(obj => {
+    obj.isCore = false;
+    allObjects.push(obj);
+  });
+
+  return allObjects;
+}
+
+function createScene(objectsArray) {
+  scene = new THREE.Scene();
+
+  // Orthographic camera looking at XY plane
+  const frustumSize = 1200;
+  const aspect = window.innerWidth / window.innerHeight;
+  camera = new THREE.OrthographicCamera(
+    -frustumSize * aspect / 2,
+    frustumSize * aspect / 2,
+    frustumSize / 2,
+    -frustumSize / 2,
+    -1000,
+    1000
+  );
+  camera.position.set(0, 0, 100);
+  camera.lookAt(0,0,0);
+  camera.zoom = 1;
+  camera.updateProjectionMatrix();
+
+  renderer = new THREE.WebGLRenderer({antialias:true});
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setClearColor(0x000000);
+  document.body.appendChild(renderer.domElement);
+
+  labelRenderer = new CSS2DRenderer();
+  labelRenderer.setSize(window.innerWidth, window.innerHeight);
+  labelRenderer.domElement.style.position = 'absolute';
+  labelRenderer.domElement.style.top = '0';
+  labelRenderer.domElement.style.pointerEvents = 'none';
+  document.body.appendChild(labelRenderer.domElement);
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+
+  const loader = new THREE.TextureLoader();
+
+  objectsArray.forEach(obj => {
+    const group = new THREE.Group();
+    group.userData = obj;
+
+    // Load texture or fallback
+    loader.load(
+      obj.icon_url,
+      (texture) => {
+        const material = new THREE.SpriteMaterial({map: texture, transparent:true});
+        const sprite = new THREE.Sprite(material);
+        sprite.scale.set(40, 40, 1);
+        group.add(sprite);
+        group.userData.sprite = sprite;
+      },
+      undefined,
+      () => {
+        const fallbackUrl = 'https://upload.wikimedia.org/wikipedia/commons/3/3f/Placeholder_view_vector.svg';
+        loader.load(fallbackUrl, (texture) => {
+          const material = new THREE.SpriteMaterial({map: texture, transparent:true});
+          const sprite = new THREE.Sprite(material);
+          sprite.scale.set(40, 40, 1);
+          group.add(sprite);
+          group.userData.sprite = sprite;
+        });
+      }
+    );
+
+    // Label - CSS2DObject, don't rotate
+    const labelDiv = document.createElement('div');
+    labelDiv.className = 'label';
+    labelDiv.textContent = obj.display_name || obj.mpa_name || obj.id || 'Unnamed';
+    const label = new CSS2DObject(labelDiv);
+    label.position.set(0, -30, 0);
+    group.add(label);
+    group.userData.label = label;
+
+    scene.add(group);
+    objects[obj.id] = group;
+  });
+}
+
+function setupControls() {
+  renderer.domElement.style.touchAction = 'none';
+
+  renderer.domElement.addEventListener('pointerdown', (e) => {
+    isDragging = true;
+    prevMousePos.x = e.clientX;
+    prevMousePos.y = e.clientY;
+  });
+
+  renderer.domElement.addEventListener('pointerup', () => {
+    isDragging = false;
+  });
+
+  renderer.domElement.addEventListener('pointerleave', () => {
+    isDragging = false;
+  });
+
+  renderer.domElement.addEventListener('pointermove', (e) => {
+    if (!isDragging) return;
+
+    const deltaX = e.clientX - prevMousePos.x;
+    const deltaY = e.clientY - prevMousePos.y;
+    prevMousePos.x = e.clientX;
+    prevMousePos.y = e.clientY;
+
+    // Pan camera
+    const panSpeed = 1;
+    camera.position.x -= deltaX * panSpeed / camera.zoom;
+    camera.position.y += deltaY * panSpeed / camera.zoom;
+    camera.updateProjectionMatrix();
+  });
+
+  renderer.domElement.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const zoomFactor = 1.05;
+    if (e.deltaY < 0) {
+      camera.zoom *= zoomFactor;
+      if (camera.zoom > 10) camera.zoom = 10;
+    } else {
+      camera.zoom /= zoomFactor;
+      if (camera.zoom < 0.1) camera.zoom = 0.1;
+    }
+    camera.updateProjectionMatrix();
+  });
+}
+
+function setupClick() {
+  window.addEventListener('click', (e) => {
+    const mouse = new THREE.Vector2(
+      (e.clientX / window.innerWidth) * 2 - 1,
+      - (e.clientY / window.innerHeight) * 2 + 1
+    );
+
+    const raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera(mouse, camera);
+
+    const intersects = [];
+    Object.values(objects).forEach(group => {
+      if(!group.userData.sprite) return;
+      const hits = raycaster.intersectObject(group.userData.sprite);
+      if(hits.length > 0) intersects.push({group, dist: hits[0].distance});
+    });
+
+    if(intersects.length === 0) {
+      infoBox.style.display = 'none';
+      followObject = null;
+      return;
+    }
+
+    intersects.sort((a,b) => a.dist - b.dist);
+    const clickedGroup = intersects[0].group;
+    const data = clickedGroup.userData;
+
+    infoBox.style.display = 'block';
+    infoBox.innerHTML = `<strong>${data.display_name || data.mpa_name || data.id}</strong><br>` +
+                        `Position: ${vecToStr(clickedGroup.position)}<br>` +
+                        `Rotation cycles duration: ${data.rotation_cycle_duration || 0} seconds`;
+
+    followObject = clickedGroup;
+    followStartTime = performance.now();
+
+    console.log('Clicked object:', data.id, data);
+  });
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+
+  const elapsed = clock.getElapsedTime();
+
+  Object.values(objects).forEach(group => {
+    const obj = group.userData;
+    if(!obj) return;
+
+    if(obj.isCore) {
+      // Core stays at center fixed, no rotation
+      group.position.set(0,0,0);
+      if(group.userData.sprite) group.userData.sprite.material.rotation = 0;
+    } else {
+      // Orbit parameters
+      if(!obj._orbitParams) obj._orbitParams = generateOrbitParams(obj.seed_id || obj.id);
+
+      const { radius, angleOffset } = obj._orbitParams;
+
+      // Orbit speed: full circle in cycle_duration seconds, fallback 60s
+      const cycleDuration = obj.rotation_cycle_duration || 60;
+
+      // Angle around orbit in radians
+      const orbitAngle = ((elapsed / cycleDuration) * 2 * Math.PI + angleOffset) % (2*Math.PI);
+
+      // Position in XY plane orbiting core at (0,0)
+      group.position.set(
+        radius * Math.cos(orbitAngle),
+        radius * Math.sin(orbitAngle),
+        0
+      );
+
+      // Spin the sprite itself around Z axis — one full spin per rotation_cycle_duration
+      if(group.userData.sprite) {
+        // rotation_cycle_duration is cycles per cycle.json duration, so
+        // rotation speed (radians per second) = cycles * 2pi / cycle.json duration
+        const spinCycles = obj.rotation_cycle_duration || 1;
+        // Spin duration in seconds for one spin
+        const spinDuration = 60 / spinCycles;  // Assuming 60s cycle.json duration for spin base
+        const spinAngle = (elapsed / spinDuration) * 2 * Math.PI;
+        group.userData.sprite.material.rotation = spinAngle;
+      }
+    }
+
+    // Keep label horizontally aligned: reset label rotation to 0 each frame
+    if(group.userData.label) {
+      group.userData.label.element.style.transform = 'translate(-50%, -50%) rotate(0deg)';
+    }
+  });
+
+  // Camera follow logic
+  if(followObject) {
+    const t = performance.now() - followStartTime;
+    if(t < FOLLOW_DURATION) {
+      // Smooth follow
+      const targetPos = followObject.position;
+      camera.position.x += (targetPos.x - camera.position.x) * 0.1;
+      camera.position.y += (targetPos.y - camera.position.y) * 0.1;
+      camera.updateProjectionMatrix();
+    } else {
+      followObject = null;
+    }
+  }
+
+  renderer.render(scene, camera);
+  labelRenderer.render(scene, camera);
+}
+
+window.addEventListener('resize', () => {
+  const aspect = window.innerWidth / window.innerHeight;
+  const frustumSize = 1200;
+  camera.left = -frustumSize * aspect / 2;
+  camera.right = frustumSize * aspect / 2;
+  camera.top = frustumSize / 2;
+  camera.bottom = -frustumSize / 2;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  labelRenderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+(async () => {
+  try {
+    const objs = await loadData();
+    createScene(objs);
+    setupControls();
+    setupClick();
+    // Hide loading overlay just before starting animation
+    const loadingDiv = document.getElementById('loadingOverlay');
+    if (loadingDiv) {
+      loadingDiv.classList.add('hidden');
+      setTimeout(() => loadingDiv.remove(), 500); // Fade-out and remove
+    }
+    animate();
+  } catch (e) {
+    const loadingDiv = document.getElementById('loadingOverlay');
+    if (loadingDiv) {
+      loadingDiv.innerHTML = "Failed to load map data.<br>"+e.message;
+      loadingDiv.style.color = 'red';
+    }
+    console.error(e);
+  }
+})();
+</script>
+
+</body>
+</html>
