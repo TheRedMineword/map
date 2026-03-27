@@ -1,0 +1,21 @@
+{
+      "title": "39th Corporation Red Stars Results",
+      "description": "**Our federation scored a total of 2,427,166 points!!**",
+      "color": 13938455,
+      "fields": [
+        
+        {
+          "name": "Total Red Stars Lifetime",
+          "value": "2 days, 6 hours, 35 minutes, 8 seconds",
+          "inline": false
+        },
+        {
+          "name": "Final Federation Rank",
+          "value": "Death Star llc. is ranked 41st",
+          "inline": false
+        }
+      ],
+      "footer": {
+        "text": "Thank you all for your contribution!"
+      }
+}
