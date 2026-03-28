@@ -2,7 +2,7 @@
 "seed_id":"65ffe18f2568b18f977554d0001057e013c6b59fba12eaadea89ec0341d8d2e6",
 "rotation_cycle_duration":31.93,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"Mx AIex",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

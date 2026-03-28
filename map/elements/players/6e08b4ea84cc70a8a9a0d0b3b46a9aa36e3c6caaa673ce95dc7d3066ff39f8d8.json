@@ -2,7 +2,7 @@
 "seed_id":"6e08b4ea84cc70a8a9a0d0b3b46a9aa36e3c6caaa673ce95dc7d3066ff39f8d8",
 "rotation_cycle_duration":30.9,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"Kavin",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

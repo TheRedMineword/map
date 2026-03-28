@@ -2,7 +2,7 @@
 "seed_id":"15eba91d93d61f4d6662cc6e810cd8da423b418864a0fe22c21fbbbcbd3aeaa7",
 "rotation_cycle_duration":36.05,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"Stef",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

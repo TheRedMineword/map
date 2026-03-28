@@ -2,7 +2,7 @@
 "seed_id":"71b5a71172bd673fda9590f0b8f94cb7105d41c9c5191947cb34305929c5c74f",
 "rotation_cycle_duration":29.87,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"Daleth Alizar",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

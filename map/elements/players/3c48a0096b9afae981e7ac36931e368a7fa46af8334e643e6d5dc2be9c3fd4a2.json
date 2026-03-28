@@ -2,7 +2,7 @@
 "seed_id":"3c48a0096b9afae981e7ac36931e368a7fa46af8334e643e6d5dc2be9c3fd4a2",
 "rotation_cycle_duration":33.99,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"Geddy",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

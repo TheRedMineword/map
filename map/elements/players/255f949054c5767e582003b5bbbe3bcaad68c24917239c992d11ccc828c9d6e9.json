@@ -2,7 +2,7 @@
 "seed_id":"255f949054c5767e582003b5bbbe3bcaad68c24917239c992d11ccc828c9d6e9",
 "rotation_cycle_duration":31.93,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"Sargento_Paiva",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

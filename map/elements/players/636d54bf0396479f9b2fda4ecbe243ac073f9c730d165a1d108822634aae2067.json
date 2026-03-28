@@ -2,7 +2,7 @@
 "seed_id":"636d54bf0396479f9b2fda4ecbe243ac073f9c730d165a1d108822634aae2067",
 "rotation_cycle_duration":26.78,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"Wyn",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

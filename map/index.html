@@ -855,12 +855,86 @@ document.body.style.backgroundColor = '#000'; // fallback
   }
 })();
 
+
+
+
+
+
+
+// --- SHA1 helper ---
+async function sha1(str) {
+  const buf = await crypto.subtle.digest(
+    "SHA-1",
+    new TextEncoder().encode(str)
+  );
+  return [...new Uint8Array(buf)]
+    .map(b => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+// --- Fetch uniqe.txt with NO cache ---
+async function getVersionJams() {
+  const url = `https://theredmineword.github.io/map/map/uniqe.txt?jam=${Math.random()}`;
+  const text = await fetch(url).then(r => r.text());
+
+  const lines = text.trim().split("\n");
+
+  console.log("uniqe.txt raw:");
+  console.log(lines);
+
+  const hashes = await Promise.all(lines.map(l => sha1(l)));
+
+  console.log("uniqe.txt sha1:");
+  console.log(hashes);
+
+  return {
+    config: hashes[0],
+    cycle: hashes[1],
+    elements: hashes[2],
+    extra: hashes[3] || ""
+  };
+}
+
+// --- Convert mixed input → fetchable URL ---
+function normalizeElementSource(input) {
+  // URL
+  if (typeof input === "string" && /^(https?:)?\/\//.test(input)) {
+    return input;
+  }
+
+  // JSON string
+  if (typeof input === "string") {
+    // const base64 = btoa(unescape(encodeURIComponent(input)));
+    // return `data:application/json;base64,${base64}`;
+    return input;
+  }
+
+  // Object
+  if (typeof input === "object") {
+    const json = JSON.stringify(input);
+    const base64 = btoa(unescape(encodeURIComponent(json)));
+    return `data:application/json;base64,${base64}`;
+  }
+
+  throw new Error("Unsupported element source");
+}
+
+
+
+
+
+
+
 (async () => {
   try {
-    const [cycle, config] = await Promise.all([
-      fetch(`https://theredmineword.github.io/map/map/cycle.json?time=${encodeURIComponent(new Date().toISOString())}&jam=${Math.random().toString(36).slice(2, 10)}`).then(r => r.json()),
-      fetch(`https://theredmineword.github.io/map/map/config.json?time=${encodeURIComponent(new Date().toISOString())}&jam=${Math.random().toString(36).slice(2, 10)}`).then(r => r.json())
-    ]);
+    
+        const versions = await getVersionJams();
+
+      const [cycle, config] = await Promise.all([
+        fetch(`https://theredmineword.github.io/map/map/cycle.json?jam=${versions.cycle}`).then(r => r.json()),
+        fetch(`https://theredmineword.github.io/map/map/config.json?jam=${versions.config}`).then(r => r.json())
+      ]);
+
     cycleData = cycle.movement;
     config.effects.forEach(eff => {
       const fn = parseEffectFunction(eff.function);
@@ -872,12 +946,24 @@ document.body.style.backgroundColor = '#000'; // fallback
 console.log("validParents");
 console.log(validParents);
 const baseUrl = config.galaxy.elements;
-const urlWithParams = `${baseUrl}?time=${encodeURIComponent(new Date().toISOString())}&jam=${Math.random().toString(36).slice(2, 10)}`;
-
-    const elementsUrls = await fetch(urlWithParams).then(r => r.json());
+      const elementsUrls = await fetch(`${baseUrl}?jam=${versions.elements}`).then(r => r.json());
 console.log("elementsUrls");
 console.log(elementsUrls);
-    const elementsArrays = await Promise.all(elementsUrls.map(url => fetch(url).then(r => r.json())));
+
+const elementsArrays = await Promise.all(
+  elementsUrls.map(async raw => {
+    const url = normalizeElementSource(raw);
+
+    const res = await fetch(
+      url.startsWith("data:")
+        ? url
+        : `${url}?jam=${versions.elements}`
+    );
+
+    return res.json();
+  })
+);
+
 console.log("elementsArrays");
 console.log(elementsArrays);
     const elementsData = elementsArrays.flat().filter(e => e.parent_id && validParents.has(e.parent_id));

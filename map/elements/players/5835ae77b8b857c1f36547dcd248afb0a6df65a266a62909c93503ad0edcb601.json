@@ -2,7 +2,7 @@
 "seed_id":"5835ae77b8b857c1f36547dcd248afb0a6df65a266a62909c93503ad0edcb601",
 "rotation_cycle_duration":37.08,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"Mayumi",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

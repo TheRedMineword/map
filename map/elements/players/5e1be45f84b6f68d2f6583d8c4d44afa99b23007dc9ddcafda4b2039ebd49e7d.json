@@ -2,7 +2,7 @@
 "seed_id":"5e1be45f84b6f68d2f6583d8c4d44afa99b23007dc9ddcafda4b2039ebd49e7d",
 "rotation_cycle_duration":26.78,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"ghost boy",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

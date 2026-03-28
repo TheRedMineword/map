@@ -2,7 +2,7 @@
 "seed_id":"538ef0b8779e4b64524f0af5f968696b5199524ee2b516569b5a72e19b0fd51e",
 "rotation_cycle_duration":26.78,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"Sejgury",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

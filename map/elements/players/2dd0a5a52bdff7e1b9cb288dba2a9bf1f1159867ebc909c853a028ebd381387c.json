@@ -2,7 +2,7 @@
 "seed_id":"2dd0a5a52bdff7e1b9cb288dba2a9bf1f1159867ebc909c853a028ebd381387c",
 "rotation_cycle_duration":24.72,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"LordMoreManly",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

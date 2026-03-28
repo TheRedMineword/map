@@ -2,7 +2,7 @@
 "seed_id":"ec2037030819bac80ba975d796710ee170902a622e0d5ad49680a78e6e34c03f",
 "rotation_cycle_duration":25.75,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"Orion",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

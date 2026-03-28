@@ -2,7 +2,7 @@
 "seed_id":"92ca5d3becd2bbbe4b65cb96f11b2aeed669f5fc6029736e49acfd5ae39bdc16",
 "rotation_cycle_duration":25.75,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"Chimaira",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

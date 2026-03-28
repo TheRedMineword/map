@@ -2,7 +2,7 @@
 "seed_id":"804d0a92c1b186085a586277f03091e2a90caa5ea30353ed701f4c95350341a3",
 "rotation_cycle_duration":30.9,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"Mongolow",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

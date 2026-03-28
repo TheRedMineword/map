@@ -2,7 +2,7 @@
 "seed_id":"4ce52376708de59b5992f893c2aaa7b8f85bf320b0320e4deebe9b735a2dd2b9",
 "rotation_cycle_duration":33.99,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"吃泡泡糖的第二只狗",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

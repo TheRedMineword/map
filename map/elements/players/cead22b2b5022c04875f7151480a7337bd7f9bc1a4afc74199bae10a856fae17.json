@@ -2,7 +2,7 @@
 "seed_id":"cead22b2b5022c04875f7151480a7337bd7f9bc1a4afc74199bae10a856fae17",
 "rotation_cycle_duration":25.75,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"Tahsin",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

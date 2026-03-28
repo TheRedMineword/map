@@ -133,13 +133,97 @@ const server = http.createServer((req, res) => {
 
   try {
 
+
+
+    // Quick POST check for /.is_this_local_host
+if (req.method === "POST" && req.url === "/.is_this_local_host") {
+  console.log("Local host check triggered");
+  console.log("GREETINGS FROM LOCAL HOST")
+
+  // Example: pick a rare HTTP code for “true” response
+  const TRUE_STATUS = 218; // just a random “rare” unused-ish code
+
+  res.statusCode = TRUE_STATUS;
+  res.setHeader("Content-Type", "application/json");
+
+  // You can send any payload you like
+  res.end(JSON.stringify({ localHost: true }));
+
+  return; // stop further processing
+}
+
+
     const filePath = resolveFile(req.url);
 
     console.log("Final resolved path:", filePath);
 
+
+
+
     if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
 
       console.log("File FOUND → Serving");
+
+if (path.basename(filePath) === "elements.bin") {
+    console.log("=== elements.bin requested ===");
+
+    const raw = fs.readFileSync(filePath, "utf8");
+    console.log("Raw file content:", raw);
+
+    const data = JSON.parse(raw);
+    console.log("Parsed JSON array:", data);
+
+    const processItem = item => {
+        if (typeof item === "string") {
+            // replace URLs in plain strings
+            const replacedStr = item.replace(/https:\/\/theredmineword\.github\.io\/map/g, "http://localhost:8080/");
+            console.log("Processed string:", replacedStr);
+            return replacedStr;
+        }
+
+        // decode Base64 data URI if it's an object
+        const match = item.match(/^data:application\/json;base64,(.+)$/);
+        if (!match) return item;
+
+        const obj = JSON.parse(Buffer.from(match[1], "base64").toString("utf-8"));
+
+        const replaceUrls = x => {
+            if (typeof x === "string") {
+                return x.replace(/https:\/\/theredmineword\.github\.io\/map/g, "http://localhost:8080/");
+            } else if (Array.isArray(x)) {
+                return x.map(replaceUrls);
+            } else if (x && typeof x === "object") {
+                for (let k in x) x[k] = replaceUrls(x[k]);
+                return x;
+            }
+            return x;
+        };
+
+        const replacedObj = replaceUrls(obj);
+
+        // re-encode as Base64 data URI
+        const jsonStr = JSON.stringify(replacedObj, null, 0);
+        const b64 = Buffer.from(jsonStr, "utf-8").toString("base64");
+        const encoded = `data:application/json;base64,${b64}`;
+
+        console.log("Processed object:", encoded);
+        return encoded;
+    };
+
+    const newData = data.map(processItem);
+
+    const finalJsonStr = JSON.stringify(newData, null, 0);
+    const buffer = Buffer.from(finalJsonStr, "utf-8");
+
+    console.log("Final binary hex:", buffer.toString("hex"));
+
+    res.statusCode = 200;
+    res.setHeader("Content-Type", "application/octet-stream");
+    res.setHeader("Content-Length", buffer.length);
+    res.end(buffer);
+
+    return;
+}
 
       if (!isBinary(filePath)) {
 
@@ -155,12 +239,20 @@ const server = http.createServer((req, res) => {
 
       } else {
 
-        console.log("Binary file detected → streaming raw");
+  console.log("Binary file detected → streaming raw");
 
-        res.statusCode = 200;
-// res.setHeader("Content-Type", getContentType(filePath));
-// res.end(data);
-      }
+  res.statusCode = 200;
+  res.setHeader("Content-Type", getContentType(filePath));
+
+  fs.createReadStream(filePath)
+    .on("error", (err) => {
+      console.error("Stream error:", err);
+      res.statusCode = 500;
+      res.end("Stream error");
+    })
+    .pipe(res);
+
+}
 
       return;
     }

@@ -2,7 +2,7 @@
 "seed_id":"d95153a563130c10def69bd0510581d2db1caa83aeb0b22eabd5a949886e6075",
 "rotation_cycle_duration":26.78,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"Hotdogyums",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

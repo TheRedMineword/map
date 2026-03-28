@@ -2,7 +2,7 @@
 "seed_id":"8fce09efda87f88c392b38cc560e5c6fa328a7430d26b56c6d2fba0b362999f1",
 "rotation_cycle_duration":25.75,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"Ardentiat",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

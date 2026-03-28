@@ -1,0 +1,1 @@
+python encode.py elements.json elements.bin

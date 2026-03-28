@@ -2,7 +2,7 @@
 "seed_id":"3b98869bdfad2c3edf88ca2a8ef083d4971983405ce3fa349cb04e3ca708ef33",
 "rotation_cycle_duration":37.08,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"BörkBörkBörk",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

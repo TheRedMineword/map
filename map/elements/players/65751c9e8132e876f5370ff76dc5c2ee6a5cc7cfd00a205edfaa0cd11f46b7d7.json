@@ -2,7 +2,7 @@
 "seed_id":"65751c9e8132e876f5370ff76dc5c2ee6a5cc7cfd00a205edfaa0cd11f46b7d7",
 "rotation_cycle_duration":30.9,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"Killerufo",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

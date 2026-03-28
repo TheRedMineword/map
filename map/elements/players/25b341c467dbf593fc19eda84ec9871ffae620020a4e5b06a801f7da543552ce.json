@@ -2,7 +2,7 @@
 "seed_id":"25b341c467dbf593fc19eda84ec9871ffae620020a4e5b06a801f7da543552ce",
 "rotation_cycle_duration":35.02,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"Rajpoot ji",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

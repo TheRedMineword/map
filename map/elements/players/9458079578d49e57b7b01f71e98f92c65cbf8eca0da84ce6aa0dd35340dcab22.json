@@ -2,7 +2,7 @@
 "seed_id":"9458079578d49e57b7b01f71e98f92c65cbf8eca0da84ce6aa0dd35340dcab22",
 "rotation_cycle_duration":32.96,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"MaggotPhRo",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

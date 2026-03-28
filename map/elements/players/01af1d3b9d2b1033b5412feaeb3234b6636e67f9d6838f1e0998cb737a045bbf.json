@@ -2,7 +2,7 @@
 "seed_id":"01af1d3b9d2b1033b5412feaeb3234b6636e67f9d6838f1e0998cb737a045bbf",
 "rotation_cycle_duration":36.05,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"Thin man",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

@@ -2,7 +2,7 @@
 "seed_id":"131ceafe45e93805ff8f5cc4a500d49246a0478269cf2821ec5c9b218aca3448",
 "rotation_cycle_duration":37.08,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"Herbie2202",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

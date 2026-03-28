@@ -2,7 +2,7 @@
 "seed_id":"ff1c251dec4b6dea6b296ad9f5700fbfc5a039ed087a0e5ccbce5a17a4642b6f",
 "rotation_cycle_duration":32.96,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"Nova",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

@@ -2,7 +2,7 @@
 "seed_id":"d9003c24494b17ba93a68021190cfc7912b0a50f4a98498f9d87b09349313771",
 "rotation_cycle_duration":35.02,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"DVDLava",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

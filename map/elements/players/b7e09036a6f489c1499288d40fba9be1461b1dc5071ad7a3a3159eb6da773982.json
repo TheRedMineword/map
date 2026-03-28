@@ -2,7 +2,7 @@
 "seed_id":"b7e09036a6f489c1499288d40fba9be1461b1dc5071ad7a3a3159eb6da773982",
 "rotation_cycle_duration":32.96,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"Obitalot",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

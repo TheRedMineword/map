@@ -2,7 +2,7 @@
 "seed_id":"80baab2d9fe2532b988c24f7d6a902d7f14b8463aa010f899588e012619a94b0",
 "rotation_cycle_duration":32.96,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"landstar",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

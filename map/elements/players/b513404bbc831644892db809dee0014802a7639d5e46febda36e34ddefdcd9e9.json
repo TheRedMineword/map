@@ -2,7 +2,7 @@
 "seed_id":"b513404bbc831644892db809dee0014802a7639d5e46febda36e34ddefdcd9e9",
 "rotation_cycle_duration":36.05,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"northernpine81",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

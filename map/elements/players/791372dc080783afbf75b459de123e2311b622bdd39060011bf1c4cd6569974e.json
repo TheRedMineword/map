@@ -2,7 +2,7 @@
 "seed_id":"791372dc080783afbf75b459de123e2311b622bdd39060011bf1c4cd6569974e",
 "rotation_cycle_duration":35.02,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"Nexus Defender",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

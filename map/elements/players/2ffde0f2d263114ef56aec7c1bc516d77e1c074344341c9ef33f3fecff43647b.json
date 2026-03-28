@@ -2,7 +2,7 @@
 "seed_id":"2ffde0f2d263114ef56aec7c1bc516d77e1c074344341c9ef33f3fecff43647b",
 "rotation_cycle_duration":36.05,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"Suhrat",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

@@ -2,7 +2,7 @@
 "seed_id":"7a94275c5e63efe246f5c9a3cddee2bcce626309e3f0830bcc3801a2b820dacc",
 "rotation_cycle_duration":29.87,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"BlackSpot69",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

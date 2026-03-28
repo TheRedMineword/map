@@ -2,7 +2,7 @@
 "seed_id":"8ec4d7c828aace0465157f0923b5887da5ba55205c27ed372b97fab5713110bf",
 "rotation_cycle_duration":36.05,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"Valentyn",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

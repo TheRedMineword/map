@@ -2,7 +2,7 @@
 "seed_id":"2d6e1a6d38d0319425b9db838f668b5106143370e44c5f66ea0e574105b57301",
 "rotation_cycle_duration":28.84,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"Phonix113",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",

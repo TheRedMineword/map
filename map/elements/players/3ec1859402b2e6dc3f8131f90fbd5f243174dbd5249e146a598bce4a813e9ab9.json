@@ -2,7 +2,7 @@
 "seed_id":"3ec1859402b2e6dc3f8131f90fbd5f243174dbd5249e146a598bce4a813e9ab9",
 "rotation_cycle_duration":27.81,"min_y":"0",
 "max_y":"45000",
-"icon_url":"https://theredmineword.github.io/map/api/src/Stars/star_yellow.png",
+"icon_url":"https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
 "display_name":"MuffinPurperGurk",
 "aura_color":"#ff6600",
 "effects":[],"interaction":{"clickable":true,"data":{"title":"Yellow Star Sytem",
