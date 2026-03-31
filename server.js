@@ -168,47 +168,53 @@ if (path.basename(filePath) === "elements.bin") {
     console.log("=== elements.bin requested ===");
 
     const raw = fs.readFileSync(filePath, "utf8");
-    console.log("Raw file content:", raw);
+  //  console.log("Raw file content:", raw);
 
     const data = JSON.parse(raw);
-    console.log("Parsed JSON array:", data);
+   // console.log("Parsed JSON array:", data);
 
     const processItem = item => {
-        if (typeof item === "string") {
-            // replace URLs in plain strings
-            const replacedStr = item.replace(/https:\/\/theredmineword\.github\.io\/map/g, "http://localhost:8080/");
-            console.log("Processed string:", replacedStr);
-            return replacedStr;
+    // handle Base64 JSON first (it's still a string!)
+    if (typeof item === "string") {
+        const match = item.match(/^data:application\/json;base64,(.+)$/);
+
+        if (match) {
+            const obj = JSON.parse(Buffer.from(match[1], "base64").toString("utf-8"));
+
+            const replaceUrls = x => {
+                if (typeof x === "string") {
+                    return x.replace(/https:\/\/theredmineword\.github\.io\/map/g, "http://localhost:8080/");
+                } else if (Array.isArray(x)) {
+                    return x.map(replaceUrls);
+                } else if (x && typeof x === "object") {
+                    for (let k in x) x[k] = replaceUrls(x[k]);
+                    return x;
+                }
+                return x;
+            };
+
+            const replacedObj = replaceUrls(obj);
+
+            const jsonStr = JSON.stringify(replacedObj);
+            const b64 = Buffer.from(jsonStr, "utf-8").toString("base64");
+            const encoded = `data:application/json;base64,${b64}`;
+console.log("returning")
+          //  console.log("Processed object:", encoded);
+            return encoded;
         }
 
-        // decode Base64 data URI if it's an object
-        const match = item.match(/^data:application\/json;base64,(.+)$/);
-        if (!match) return item;
+        // fallback: plain string replacement
+        const replacedStr = item.replace(
+            /https:\/\/theredmineword\.github\.io\/map/g,
+            "http://localhost:8080/"
+        );
 
-        const obj = JSON.parse(Buffer.from(match[1], "base64").toString("utf-8"));
+       // console.log("Processed string:", replacedStr);
+        return replacedStr;
+    }
 
-        const replaceUrls = x => {
-            if (typeof x === "string") {
-                return x.replace(/https:\/\/theredmineword\.github\.io\/map/g, "http://localhost:8080/");
-            } else if (Array.isArray(x)) {
-                return x.map(replaceUrls);
-            } else if (x && typeof x === "object") {
-                for (let k in x) x[k] = replaceUrls(x[k]);
-                return x;
-            }
-            return x;
-        };
-
-        const replacedObj = replaceUrls(obj);
-
-        // re-encode as Base64 data URI
-        const jsonStr = JSON.stringify(replacedObj, null, 0);
-        const b64 = Buffer.from(jsonStr, "utf-8").toString("base64");
-        const encoded = `data:application/json;base64,${b64}`;
-
-        console.log("Processed object:", encoded);
-        return encoded;
-    };
+    return item;
+};
 
     const newData = data.map(processItem);
 

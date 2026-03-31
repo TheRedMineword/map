@@ -1,13 +1,58 @@
 (async function loadMissionBriefing() {
-  const url = `https://theredmineword.github.io/map/api/big_alert.json?jam=${Math.random()}`;
+  const base = "https://theredmineword.github.io/map/api";
+
+  console.log("[Briefing] Script started");
 
   try {
-    const response = await fetch(url);
-    const data = await response.json();
-    const shownId = localStorage.getItem("mission_briefing_shown_id");
+    // ===== STEP 1: FETCH ID =====
+    const idUrl = `${base}/bigalert?jam=${Math.random()}`;
+    console.log("[Briefing] Fetching ID from:", idUrl);
 
-    if (data.id && data.id === shownId) return;
-    localStorage.setItem("mission_briefing_shown_id", data.id);
+    const idRes = await fetch(idUrl);
+    console.log("[Briefing] ID response status:", idRes.status);
+
+    const idData = await idRes.json();
+    console.log("[Briefing] ID response data:", idData);
+
+    // FIX: API returns raw ID (e.g. 0)
+    const newId = idData;
+    console.log("[Briefing] Extracted ID:", newId);
+
+    // FIX: allow 0, only block null/undefined/empty
+    if (newId === undefined || newId === null || newId === "") {
+      console.warn("[Briefing] Invalid ID, stopping.");
+      return;
+    }
+
+    const shownId = localStorage.getItem("mission_briefing_shown_id");
+    console.log("[Briefing] Stored ID:", shownId);
+
+    // FIX: compare as strings (avoids 0 vs "0" issues)
+    if (String(newId) === String(shownId)) {
+      console.log("[Briefing] ID already shown, skipping.");
+      return;
+    }
+
+    // ===== STEP 2: FETCH FULL BRIEFING =====
+    const briefingUrl = `${base}/big_alerts/${newId}?jam=${Math.random()}`;
+    console.log("[Briefing] Fetching full briefing from:", briefingUrl);
+
+    const briefingRes = await fetch(briefingUrl);
+    console.log("[Briefing] Briefing response status:", briefingRes.status);
+
+    if (!briefingRes.ok) {
+      console.error("[Briefing] Failed to fetch briefing!");
+      return;
+    }
+
+    const data = await briefingRes.json();
+    console.log("[Briefing] Full briefing data:", data);
+
+    // Save ID AFTER successful fetch
+    localStorage.setItem("mission_briefing_shown_id", String(newId));
+    console.log("[Briefing] Saved new ID");
+
+    // ===== UI =====
 
     const style = document.createElement("style");
     style.textContent = `
@@ -150,13 +195,21 @@
       </div>
     `;
 
-    overlay.querySelector(".briefing-button").addEventListener("click", () => {
+    const btn = overlay.querySelector(".briefing-button");
+
+    if (!btn) {
+      console.error("[Briefing] Button not found!");
+      return;
+    }
+
+    btn.addEventListener("click", () => {
+      console.log("[Briefing] Closing overlay");
       overlay.remove();
     });
 
-    console.log("Briefing ID:", data.id);
+    console.log("[Briefing] DONE");
 
   } catch (e) {
-    console.error("Failed to load mission briefing:", e);
+    console.error("[Briefing] ERROR:", e);
   }
 })();

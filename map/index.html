@@ -205,6 +205,58 @@ let dayeevnts2 = [];
 let unixeveents = [];
 let unixeveents2 = [];
 let unixeveentsrun = 0;
+let hashes2 = [];
+let runnews = 0;
+let runnews2 = 0;
+function checkRunNews() {
+  console.log("[News] Running check news()");
+  console.log(runnews);
+  console.log(runnews2);
+  if (runnews === 1 & runnews2 === 1 ) {
+    console.log("[News] Running news()");
+    
+
+
+
+
+
+    function news() {
+  const randomStr = Math.random().toString().slice(2);
+  console.log("news hashes2");
+  console.log(hashes2)
+  const url = `https://theredmineword.github.io/map/api/news.json?jam=${hashes2[3] || Math.random()}`;
+
+  fetch(url)
+    .then(response => {
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    })
+    .then(data => {
+      console.log('[News Fetch] Embed data:', data);
+
+      // Define bottom-right corner position
+      const position = {
+        x: window.innerWidth - 340, // 300px embed + padding
+        y: window.innerHeight - 400 // 150px embed + padding
+      };
+
+      if (typeof window.createDiscordEmbed === 'function') {
+        console.log('[News Embed] Renderer found. Showing...');
+        window.createDiscordEmbed(data, position);
+      } else {
+        console.warn('[News Embed] createDiscordEmbed not ready yet.');
+      }
+    })
+    .catch(err => {
+      console.error('[News Fetch] Failed to load news JSON:', err);
+    });
+}
+    news(); // your function
+
+    runnews = 2; // prevent running again
+  }
+}
+
 
 let clock = new THREE.Clock();
 let infoBox = document.getElementById('infoBox');
@@ -296,9 +348,9 @@ const jsonObject = {
   };
 
   // Log as JSON string (pretty-printed)
-console.log("cords");
-  console.log(JSON.stringify(jsonObject, null, 2));
-console.log(JSON.stringify(result));
+//debug//console.log("cords");
+ //debug// console.log(JSON.stringify(jsonObject, null, 2));
+//debug//console.log(JSON.stringify(result));
 
 
   return { radius, angleOffset, zOffset };
@@ -357,6 +409,21 @@ function loadEmbedRenderer(callback) {
   script.src = `https://theredmineword.github.io/map/api/html/embed.js?jam=${jam}`;
   script.onload = () => {
     console.log("[Embed Loader] Script loaded.");
+
+
+
+
+   // console.log("NEWS");
+
+
+
+runnews2 = 1;
+checkRunNews();
+// Immediately invoke
+// news();
+
+
+
     callback();
   };
   script.onerror = () => console.error("[Embed Loader] Failed to load embed.js");
@@ -886,6 +953,11 @@ async function getVersionJams() {
 
   console.log("uniqe.txt sha1:");
   console.log(hashes);
+  const hashes2 = hashes;
+  console.log("hashes2");
+  console.log(hashes2)
+  runnews = 1;
+  checkRunNews();
 
   return {
     config: hashes[0],
@@ -947,8 +1019,8 @@ console.log("validParents");
 console.log(validParents);
 const baseUrl = config.galaxy.elements;
       const elementsUrls = await fetch(`${baseUrl}?jam=${versions.elements}`).then(r => r.json());
-console.log("elementsUrls");
-console.log(elementsUrls);
+//debug//console.log("elementsUrls");
+//debug//console.log(elementsUrls);
 
 const elementsArrays = await Promise.all(
   elementsUrls.map(async raw => {
@@ -964,11 +1036,11 @@ const elementsArrays = await Promise.all(
   })
 );
 
-console.log("elementsArrays");
-console.log(elementsArrays);
+//debug//console.log("elementsArrays");
+//debug//console.log(elementsArrays);
     const elementsData = elementsArrays.flat().filter(e => e.parent_id && validParents.has(e.parent_id));
-console.log("elementsData");
-console.log(elementsData);
+//debug//console.log("elementsData");
+//debug//console.log(elementsData);
     const allObjects = [
       {
         ...config.core_object.data,
@@ -981,8 +1053,8 @@ console.log(elementsData);
       ...config.core_object.close_orbit.map(o => ({ ...o, isCore: false })),
       ...elementsData.map(o => ({ ...o, isCore: false }))
     ];
-console.log("allObjects before");
-console.log(allObjects);
+//debug//console.log("allObjects before");
+//debug//console.log(allObjects);
 
 async function loadDayEvents() {
     const randomJam = Math.random().toString(36).substring(2);
@@ -1147,8 +1219,8 @@ let dayeevnts2 = await loadDayEvents();
 
 // const allObjects2 = [...allObjects, ...elementsArrays];
 const allObjects2 = [...allObjects, ...elementsArrays, ...dayeevnts2, ...unixeveents];
-console.log("allObjects after");
-console.log(allObjects2);
+//debug////debug//console.log("allObjects after");
+//debug//console.log(allObjects2);
 localStorage.setItem('allobject', JSON.stringify(allObjects2));
 
 function logArray(label, arr, color) {
@@ -1156,8 +1228,8 @@ function logArray(label, arr, color) {
   console.log(arr);
 }
 
-logArray('allObjects', allObjects, 'blue');
-logArray('elementsArrays', elementsArrays, 'green');
+//debug//logArray('allObjects', allObjects, 'blue');
+//debug//logArray('elementsArrays', elementsArrays, 'green');
 logArray('dayeevnts2', dayeevnts2, 'orange');
 logArray('unixeveents', unixeveents, 'purple');
 
