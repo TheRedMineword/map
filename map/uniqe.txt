@@ -1,4 +1,4 @@
-new //config
-4567 //cycle
-kdjfghbkdjg //elements
-99999 //news
+0 //config
+1 //cycle
+2 //elements
+3 //news

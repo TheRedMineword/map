@@ -3,6 +3,8 @@
 
 const createPopup = ({ id, popup, fulltext }) => {
   if (!popup || !popup.title || !popup.shortdesc) return;
+console.log("small.js input:");
+console.log(popup);
 
   const container = document.getElementById(popupContainerId) || (() => {
     const c = document.createElement("div");

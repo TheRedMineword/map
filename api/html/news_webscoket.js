@@ -1,7 +1,7 @@
 (async () => {
   const instanceBaseUrl = "https://x8ki-letl-twmt.n7.xano.io/";
-  const realtimeConnectionHash = "2clJNoquRY-vPfH1dqxY-jKZ4ig";
-  const channelName = "news";
+  const realtimeConnectionHash = "0tOCKMg89plUCqKuBgdfTDuCpww";
+  const channelName = "ws_map";
   const timestamp = () => Math.floor(Date.now() / (1000 * 150)); // changes every 2.5 mins
 
   // 1. Dynamically fetch external websocket handler (you mentioned it's needed)
@@ -29,8 +29,11 @@
     channel.on((action) => {
       console.log(`[Received] ${JSON.stringify(action)}`);
       const payload = action?.payload?.data;
+	console.log(`[WS_payload] ${JSON.stringify(payload)}`);
 
       if (payload?.type === "small" && typeof window.file1func === "function") {
+console.log("[WS]: Eval window.file1func(payload.payload);");
+console.log(payload.payload);
   window.file1func(payload.payload);
 } else if (payload?.type === "big" && typeof window.file2func === "function") {
   window.file2func(payload.payload);
