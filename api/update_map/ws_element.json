@@ -3,13 +3,13 @@
   "star_icon": "https://theredmineword.github.io/map/api/src/icons/white_star_fragments.png",
   "ranges": {
     "cycle": {
-      "min": 10,
-      "max": 25,
+      "min": 8,
+      "max": 18,
       "decimal": "true:2"
     },
     "range": {
-      "min": 10000,
-      "max": 150000,
+      "min": 175,
+      "max": 999,
       "decimal": "true:2"
     }
   },
