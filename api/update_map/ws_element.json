@@ -8,8 +8,8 @@
       "decimal": "true:4"
     },
     "range": {
-      "min": 175,
-      "max": 9990,
+      "min": 375,
+      "max": 7990,
       "decimal": "true:2"
     }
   },
