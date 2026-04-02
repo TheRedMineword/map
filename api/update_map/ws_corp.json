@@ -4,12 +4,12 @@
   "ranges": {
     "cycle": {
       "min": 10,
-      "max": 25,
-      "decimal": "true:3"
+      "max": 50,
+      "decimal": "true:7"
     },
     "range": {
       "min": 1000,
-      "max": 7000,
+      "max": 9000,
       "decimal": "true:2"
     }
   },

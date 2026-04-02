@@ -9,7 +9,7 @@
     },
     "range": {
       "min": 175,
-      "max": 999,
+      "max": 9990,
       "decimal": "true:2"
     }
   },
