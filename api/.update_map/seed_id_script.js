@@ -1,5 +1,5 @@
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
+let resultfin = null;
     function uidToSlug2ToDec(slice) {
       let out = String(slice ?? "").trim().toLowerCase();
       for (let dec = 0; dec < 256; dec++) {
@@ -83,6 +83,7 @@ const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
       const digits = ("" + object._4 + object._5 + object._6 + object._7).substr(0, 4);
       const slug = "" + letters + "-" + digits;
 console.log(slug);
+resultfin = slug;
       return slug;
     }
 
@@ -93,10 +94,11 @@ console.log(slug);
     }
 
     function run() {
-      const uid = "b47cb4e714937b670910e958d50fc67e5e074b1349a341a1e3c683e976824745";
+      const uid = "$$REPLACEME$$";
       const seedArray = [23,41,49,28,23,14,16];
 console.log(uid);
-console.log(seedArray);
+// console.log(seedArray);
       const result = convert(uid, seedArray);
 }
 run();
+resultfin;

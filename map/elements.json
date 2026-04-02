@@ -1,28 +1,6 @@
 [
 "https://theredmineword.github.io/map/map/elements/players/01af1d3b9d2b1033b5412feaeb3234b6636e67f9d6838f1e0998cb737a045bbf.json",
-  {
-  "id": "test__3c48a0096b9afae981e7ac36931e368a7fa46af8334e643e6d5dc2be9c3fd4a2",
-  "seed_id": "test__3c48a0096b9afae981e7ac36931e368a7fa46af8334e643e6d5dc2be9c3fd4a2",
-  "rotation_cycle_duration": 3.99,
-  "min_y": "0",
-  "max_y": "45000",
-  "icon_url": "https://theredmineword.github.io/map/api/src/standard_star_icons/hs/star_yellow.png",
-  "display_name": "TEST",
-  "aura_color": "#ff6600",
-  "effects": [],
-  "interaction": {
-    "clickable": true,
-    "data": {
-      "title": "Yellow Star Sytem",
-      "description": "**Yellow Stars** contain numerous habitable planets and are great for building base infrastructure. Each Empire is assigned its own Yellow Star to establish its base of operations.\nYellow Stars are combat safe. There is no combat between player forces. Ships lost to combat against Cerberus will safely return to a colonized planet.\n\nYou are looking at the Yellow Star of the **Federation Member**",
-      "color": 16776960,
-      "image": {
-        "url": "https://theredmineword.github.io/map/api/src/portraits/portrait_YellowStar.png"
-      }
-    }
-  },
-  "parent_id": "core_001"
-},
+  {"id":"cbde89e2-2178-41f0-b67b-5b80e71c7059","seed_id":"49b03470f7740e5e37f72030f6909fae3a1113a7","rotation_cycle_duration":20.36,"min_y":10000,"max_y":150000,"icon_url":"https://theredmineword.github.io/map/api/src/icons/white_star_fragments.png","display_name":"\u003CWFR-7223\u003E \nNox Imperium vs Osmium Star llc","aura_color":"#afd4e6","effects":[],"interaction":{"clickable":true,"data":{"title":"White Star WFR-7223","description":"{formated_msg}","color":11523302,"footer":{"text":"Ended"},"timestamp":"2026-01-17T15:12:35.7747148Z","image":{"url":"https://theredmineword.github.io/map/api/src/portraits/portrait_WhiteStar.png"}}},"parent_id":"core_001"},
 "https://theredmineword.github.io/map/map/elements/players/03eca587798621b02755bb89995066e2614d86f0a55126960341f327d5212aca.json",
   "https://theredmineword.github.io/map/map/elements/players/06fa52bae81799e5658ac7ede5ed672e0df1635eba497e1b62cc2b4ee408f9f9.json",
   "https://theredmineword.github.io/map/map/elements/players/0c5bad6c692373e3fc897371e9a0f28607ad184c3ea2720e2d4351ecbb2322d1.json",
