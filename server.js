@@ -1,6 +1,8 @@
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
+const zlib = require("zlib");
+
 
 const ROOT = process.cwd();
 const PORT = 8080;
@@ -157,79 +159,83 @@ if (req.method === "POST" && req.url === "/.is_this_local_host") {
 
     console.log("Final resolved path:", filePath);
 
+if (path.basename(filePath) === "elements.bin") {
+    console.log("=== elements.bin requested ===");
 
+    // 1. read compressed binary
+    const raw = fs.readFileSync(filePath);
+
+    console.log("[INFO] Decompressing gzip...");
+    const decompressed = zlib.gunzipSync(raw);
+
+    console.log("[INFO] Parsing JSON...");
+    const data = JSON.parse(decompressed.toString("utf-8"));
+
+    const replaceUrls = x => {
+        if (typeof x === "string") {
+            return x.replace(
+                /https:\/\/theredmineword\.github\.io\/map/g,
+                "http://localhost:8080/"
+            );
+        } else if (Array.isArray(x)) {
+            return x.map(replaceUrls);
+        } else if (x && typeof x === "object") {
+            for (let k in x) x[k] = replaceUrls(x[k]);
+            return x;
+        }
+        return x;
+    };
+
+    const processItem = item => {
+        // 1. string handling
+        if (typeof item === "string") {
+            const match = item.match(/^data:application\/json;base64,(.+)$/);
+
+            // base64 JSON → decode → replace → re-encode
+            if (match) {
+                const obj = JSON.parse(
+                    Buffer.from(match[1], "base64").toString("utf-8")
+                );
+
+                const replacedObj = replaceUrls(obj);
+
+                const jsonStr = JSON.stringify(replacedObj);
+                const b64 = Buffer.from(jsonStr, "utf-8").toString("base64");
+
+                return `data:application/json;base64,${b64}`;
+            }
+
+            // plain string → just replace
+            return item.replace(
+                /https:\/\/theredmineword\.github\.io\/map/g,
+                "http://localhost:8080/"
+            );
+        }
+
+        // 2. object → replace → encode to base64
+        if (typeof item === "object" && item !== null) {
+            const replacedObj = replaceUrls(item);
+
+            const jsonStr = JSON.stringify(replacedObj);
+            const b64 = Buffer.from(jsonStr, "utf-8").toString("base64");
+
+            return `data:application/json;base64,${b64}`;
+        }
+
+        return item;
+    };
+
+    const output = data.map(processItem);
+
+    console.log("[INFO] Done processing elements.bin");
+}
 
 
     if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
 
       console.log("File FOUND → Serving");
 
-if (path.basename(filePath) === "elements.bin") {
-    console.log("=== elements.bin requested ===");
 
-    const raw = fs.readFileSync(filePath, "utf8");
-  //  console.log("Raw file content:", raw);
-
-    const data = JSON.parse(raw);
-   // console.log("Parsed JSON array:", data);
-
-    const processItem = item => {
-    // handle Base64 JSON first (it's still a string!)
-    if (typeof item === "string") {
-        const match = item.match(/^data:application\/json;base64,(.+)$/);
-
-        if (match) {
-            const obj = JSON.parse(Buffer.from(match[1], "base64").toString("utf-8"));
-
-            const replaceUrls = x => {
-                if (typeof x === "string") {
-                    return x.replace(/https:\/\/theredmineword\.github\.io\/map/g, "http://localhost:8080/");
-                } else if (Array.isArray(x)) {
-                    return x.map(replaceUrls);
-                } else if (x && typeof x === "object") {
-                    for (let k in x) x[k] = replaceUrls(x[k]);
-                    return x;
-                }
-                return x;
-            };
-
-            const replacedObj = replaceUrls(obj);
-
-            const jsonStr = JSON.stringify(replacedObj);
-            const b64 = Buffer.from(jsonStr, "utf-8").toString("base64");
-            const encoded = `data:application/json;base64,${b64}`;
-console.log("returning")
-          //  console.log("Processed object:", encoded);
-            return encoded;
-        }
-
-        // fallback: plain string replacement
-        const replacedStr = item.replace(
-            /https:\/\/theredmineword\.github\.io\/map/g,
-            "http://localhost:8080/"
-        );
-
-       // console.log("Processed string:", replacedStr);
-        return replacedStr;
-    }
-
-    return item;
-};
-
-    const newData = data.map(processItem);
-
-    const finalJsonStr = JSON.stringify(newData, null, 0);
-    const buffer = Buffer.from(finalJsonStr, "utf-8");
-
-    console.log("Final binary hex:", buffer.toString("hex"));
-
-    res.statusCode = 200;
-    res.setHeader("Content-Type", "application/octet-stream");
-    res.setHeader("Content-Length", buffer.length);
-    res.end(buffer);
-
-    return;
-}
 
       if (!isBinary(filePath)) {
 

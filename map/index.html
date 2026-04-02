@@ -2,14 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Astral Alliance - Galaxy Map</title>
+  <title>Galaxy White Star Map</title>
 
-<meta property="og:title" content="Astral Alliance - Galaxy Map" />
+<meta property="og:title" content="Galaxy White Star Map" />
     <meta property="og:description" content="This is a map of our galaxy
-You can here find our friends and enemies
-Red and White Stars" />
+You can here find our past White Stars" />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://theredmineword.github.io/map/api/src/Other/galaxy_map.png" />
+    <meta property="og:image" content="https://theredmineword.github.io/map/api/src/portraits/portrait_Sentinel.png" />
     <meta name="theme-color" content="#92E7CB">
 <meta name="twitter:card" content="summary_large_image">
 
@@ -967,34 +966,6 @@ async function getVersionJams() {
   };
 }
 
-// --- Convert mixed input → fetchable URL ---
-function normalizeElementSource(input) {
-  // URL
-  if (typeof input === "string" && /^(https?:)?\/\//.test(input)) {
-    return input;
-  }
-
-  // JSON string
-  if (typeof input === "string") {
-    // const base64 = btoa(unescape(encodeURIComponent(input)));
-    // return `data:application/json;base64,${base64}`;
-    return input;
-  }
-
-  // Object
-  if (typeof input === "object") {
-    const json = JSON.stringify(input);
-    const base64 = btoa(unescape(encodeURIComponent(json)));
-    return `data:application/json;base64,${base64}`;
-  }
-
-  throw new Error("Unsupported element source");
-}
-
-
-
-
-
 
 
 (async () => {
@@ -1017,24 +988,110 @@ function normalizeElementSource(input) {
     const validParents = new Set([config.core_object.data.id, ...config.core_object.close_orbit.map(o => o.id)]);
 console.log("validParents");
 console.log(validParents);
-const baseUrl = config.galaxy.elements;
-      const elementsUrls = await fetch(`${baseUrl}?jam=${versions.elements}`).then(r => r.json());
-//debug//console.log("elementsUrls");
-//debug//console.log(elementsUrls);
 
-const elementsArrays = await Promise.all(
-  elementsUrls.map(async raw => {
-    const url = normalizeElementSource(raw);
 
-    const res = await fetch(
-      url.startsWith("data:")
-        ? url
-        : `${url}?jam=${versions.elements}`
+
+async function fetchAndNormalizeElement(input, versionTag, asDataUri = false) {
+  console.log("[DEBUG] Input type:", input?.constructor?.name);
+
+  function objectToDataUri(obj) {
+    const jsonStr = JSON.stringify(obj);
+    const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
+    return `data:application/json;base64,${base64}`;
+  }
+
+  async function decompressGzipToJson(uint8) {
+    if (uint8[0] !== 0x1f || uint8[1] !== 0x8b) {
+      throw new Error("Not a gzip file");
+    }
+
+    const ds = new DecompressionStream("gzip");
+    const decompressedStream = new Blob([uint8]).stream().pipeThrough(ds);
+    const decompressedBuffer = await new Response(decompressedStream).arrayBuffer();
+    const text = new TextDecoder().decode(decompressedBuffer);
+    return JSON.parse(text);
+  }
+
+  let obj;
+
+  // DATA URI
+  if (typeof input === "string" && input.startsWith("data:")) {
+    const base64 = input.split(",")[1];
+    const uint8 = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+
+    obj = (uint8[0] === 0x1f && uint8[1] === 0x8b)
+      ? await decompressGzipToJson(uint8)
+      : JSON.parse(new TextDecoder().decode(uint8));
+  }
+
+  // URL
+  else if (typeof input === "string" && /^(https?:)?\/\//.test(input)) {
+    console.log("[DEBUG] Fetching URL:", input);
+
+    const res = await fetch(`${input}?jam=${versionTag}`);
+    const buffer = await res.arrayBuffer();
+    const uint8 = new Uint8Array(buffer);
+
+    obj = (uint8[0] === 0x1f && uint8[1] === 0x8b)
+      ? await decompressGzipToJson(uint8)
+      : JSON.parse(new TextDecoder().decode(uint8));
+  }
+
+  // ARRAY BUFFER
+  else if (input instanceof ArrayBuffer || input instanceof Uint8Array || ArrayBuffer.isView(input)) {
+    const uint8 = input instanceof Uint8Array ? input : new Uint8Array(input);
+
+    obj = (uint8[0] === 0x1f && uint8[1] === 0x8b)
+      ? await decompressGzipToJson(uint8)
+      : JSON.parse(new TextDecoder().decode(uint8));
+  }
+
+  // OBJECT
+  else if (typeof input === "object") {
+    obj = input;
+  }
+
+  else {
+    throw new Error("Unsupported element source");
+  }
+
+  // 🔥 IMPORTANT FIX
+  // If result is array → normalize its items
+  if (Array.isArray(obj)) {
+    const results = await Promise.all(
+      obj.map(async item => {
+        if (typeof item === "string" || item instanceof ArrayBuffer || item instanceof Uint8Array) {
+          return fetchAndNormalizeElement(item, versionTag, false);
+        }
+        return item;
+      })
     );
 
-    return res.json();
-  })
-);
+    return asDataUri ? objectToDataUri(results) : results;
+  }
+
+  return asDataUri ? objectToDataUri(obj) : obj;
+}
+
+// ================= Usage Example =================
+
+
+
+const baseUrl = config.galaxy.elements;
+
+// Step 1: fetch the raw binary list of elements
+const res = await fetch(`${baseUrl}?jam=${versions.elements}`);
+const arrayBuffer = await res.arrayBuffer(); // get raw bytes
+
+// Step 2: use your fetchAndNormalizeElement helper to parse
+// Pass the ArrayBuffer directly
+const elementsArrays = await fetchAndNormalizeElement(arrayBuffer, versions.elements);
+
+console.log("[DEBUG] All elements loaded:", elementsArrays.length);
+
+
+
+
 
 //debug//console.log("elementsArrays");
 //debug//console.log(elementsArrays);

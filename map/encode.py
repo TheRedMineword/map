@@ -1,34 +1,36 @@
 import json
-import base64
+import gzip
 import sys
 
-def encode_to_data_uri(obj):
-    json_str = json.dumps(obj, separators=(",", ":"), ensure_ascii=False)
-    b64 = base64.b64encode(json_str.encode("utf-8")).decode("ascii")
-    return f"data:application/json;base64,{b64}"
+def process_file(input_file, output_file):
+    print(f"[INFO] Reading: {input_file}")
 
-def process_elements(input_file, output_file):
     with open(input_file, "r", encoding="utf-8") as f:
         data = json.load(f)
 
-    if not isinstance(data, list):
-        raise ValueError("Input JSON must be an array")
+    print("[INFO] Minifying JSON...")
+    json_bytes = json.dumps(
+        data,
+        separators=(",", ":"),  # removes whitespace
+        ensure_ascii=False
+    ).encode("utf-8")
 
-    output = []
+    print(f"[DEBUG] Minified size: {len(json_bytes)} bytes")
 
-    for item in data:
-        if isinstance(item, str):
-            # leave ALL strings untouched
-            output.append(item)
-        else:
-            # encode objects (dict, list, etc.)
-            output.append(encode_to_data_uri(item))
+    print("[INFO] Compressing with gzip...")
+    compressed = gzip.compress(json_bytes, compresslevel=9)
 
-    with open(output_file, "w", encoding="utf-8") as f:
-        json.dump(output, f, separators=(",", ":"), ensure_ascii=False)
+    print(f"[DEBUG] Compressed size: {len(compressed)} bytes")
 
-    print("OK:", output_file)
+    print(f"[INFO] Writing: {output_file}")
+    with open(output_file, "wb") as f:
+        f.write(compressed)
 
+    print("[SUCCESS] Done")
 
 if __name__ == "__main__":
-    process_elements(sys.argv[1], sys.argv[2])
+    if len(sys.argv) != 3:
+        print("Usage: python script.py input.json output.bin")
+        sys.exit(1)
+
+    process_file(sys.argv[1], sys.argv[2])
