@@ -8,10 +8,10 @@
       "decimal": "true:7"
     },
     "range": {
-      "min": 1000,
-      "max": 9000,
+      "min": 10000,
+      "max": 90000,
       "decimal": "true:2"
     }
   },
-  "show_name": "fCRuYW1lfA=="
+  "show_name": "fCRuYW1lfCBDb3Jwb3JhdGlvbiBTY2FubmVy"
 }
