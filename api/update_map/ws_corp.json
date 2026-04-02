@@ -9,7 +9,7 @@
     },
     "range": {
       "min": 10000,
-      "max": 90000,
+      "max": 90900,
       "decimal": "true:2"
     }
   },
