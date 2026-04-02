@@ -1,0 +1,17 @@
+{
+  "aura_hex": "#afd4e6",
+  "star_icon": "https://theredmineword.github.io/map/api/src/icons/white_star_fragments.png",
+  "ranges": {
+    "cycle": {
+      "min": 10,
+      "max": 25,
+      "decimal": "true:2"
+    },
+    "range": {
+      "min": 10000,
+      "max": 150000,
+      "decimal": "true:2"
+    }
+  },
+  "show_name": "PHwkaWR8PiAKfCRuYW1lMXwgdnMgfCRuYW1lMnw="
+}
