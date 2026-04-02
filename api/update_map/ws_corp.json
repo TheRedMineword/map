@@ -5,7 +5,7 @@
     "cycle": {
       "min": 10,
       "max": 25,
-      "decimal": "true:2"
+      "decimal": "true:3"
     },
     "range": {
       "min": 10000,
@@ -13,5 +13,5 @@
       "decimal": "true:2"
     }
   },
-  "show_name": "PHwkaWR8PiAKfCRuYW1lMXwgdnMgfCRuYW1lMnw="
+  "show_name": "fCRuYW1lfA=="
 }
