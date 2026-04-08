@@ -1,4 +1,4 @@
 0 //config
 1 //cycle
-UPDATE!! //elements
-UPDATE!! //news
+08/04/2026:20:09 //elements
+08/04/2026:20:09 //news

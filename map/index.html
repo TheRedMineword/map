@@ -23,6 +23,24 @@ You can here find our past White Stars" />
       background: #000;
       font-family: sans-serif;
     }
+
+
+
+#mapIframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    z-index: 0; /* behind the canvas */
+}
+
+canvas {
+    position: relative;
+    z-index: 1; /* in front */
+}
+
 #infoBox {
   position: fixed;
   bottom: 20px;
@@ -192,6 +210,12 @@ You can here find our past White Stars" />
 <script type="module">
 import * as THREE from 'three';
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+
+
+const activePointers = new Map();
+
+
 
 let camera, scene, renderer, labelRenderer;
 let objects = {};
@@ -487,101 +511,187 @@ tryShowEmbed(data);
 
   console.log("Seed → Coords:", data.seed_id, vecToStr(group.position));
 }
+
+
+const pointers = new Map();
+let lastDistance = 0;
+
+
 function setupClick() {
-  window.addEventListener('click', (event) => {
+  const canvas = renderer.domElement;
+
+  function handleRaycastClick(event) {
     const mouse = new THREE.Vector2(
       (event.clientX / window.innerWidth) * 2 - 1,
       -(event.clientY / window.innerHeight) * 2 + 1
     );
+
     const raycaster = new THREE.Raycaster();
     raycaster.setFromCamera(mouse, camera);
+
     const allClickable = mapObjects.flatMap(g => g.children);
     const intersects = raycaster.intersectObjects(allClickable);
+
     if (intersects.length > 0) {
       simulateClickOnGroup(intersects[0].object.parent);
     }
+  }
+
+  // Desktop click
+  window.addEventListener('click', handleRaycastClick);
+
+  // Mobile tap (more reliable)
+  canvas.addEventListener('pointerup', e => {
+    if (activePointers.size === 0) {
+      handleRaycastClick(e);
+    }
   });
-}
-function setupControls() {
-  const canvas = renderer.domElement;
-  canvas.addEventListener('pointerdown', e => {
+
+
+canvas.addEventListener('pointerdown', e => {
+  activePointers.set(e.pointerId, {
+    x: e.clientX,
+    y: e.clientY
+  });
+
+  if (activePointers.size === 1) {
     isDragging = true;
     prevMousePos = { x: e.clientX, y: e.clientY };
-  });
-  canvas.addEventListener('pointerup', () => isDragging = false);
-  canvas.addEventListener('pointerleave', () => isDragging = false);
-  canvas.addEventListener('pointermove', e => {
-    if (!isDragging) return;
-    const dx = e.clientX - prevMousePos.x;
-    const dy = e.clientY - prevMousePos.y;
-    prevMousePos = { x: e.clientX, y: e.clientY };
-    const panSpeed = 2.3;
-    camera.position.x -= dx * panSpeed / camera.zoom;
-    camera.position.y += dy * panSpeed / camera.zoom;
-    userInteracted = true;
-  });
-  canvas.addEventListener('wheel', e => {
-    e.preventDefault();
-    const factor = 1.05;
-    camera.zoom *= (e.deltaY < 0 ? factor : 1 / factor);
-    camera.zoom = THREE.MathUtils.clamp(camera.zoom, 0.00000000000000000000000000000000000000000000000000001, 10);
-    camera.updateProjectionMatrix();
-    userInteracted = true;
-  });
-
-window.addEventListener('keydown', e => {
-  const moveAmount = 23;
-  const zoomFactor = 1.05;
-
-  switch (e.key) {
-    case '0':
-      camera.zoom = 1;
-      camera.updateProjectionMatrix();
-      userInteracted = true;
-      break;
-
-    case '+':
-    case '=':
-      camera.zoom *= zoomFactor;
-      camera.zoom = THREE.MathUtils.clamp(camera.zoom, 0.000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001, 10);
-      camera.updateProjectionMatrix();
-      userInteracted = true;
-      break;
-
-    case '-':
-      camera.zoom /= zoomFactor;
-      camera.zoom = THREE.MathUtils.clamp(camera.zoom, 0.000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001, 10);
-      camera.updateProjectionMatrix();
-      userInteracted = true;
-      break;
-
-    case 'ArrowUp':
-      camera.position.y += moveAmount;
-      userInteracted = true;
-      break;
-
-    case 'ArrowDown':
-      camera.position.y -= moveAmount;
-      userInteracted = true;
-      break;
-
-    case 'ArrowLeft':
-      camera.position.x -= moveAmount;
-      userInteracted = true;
-      break;
-
-    case 'ArrowRight':
-      camera.position.x += moveAmount;
-      userInteracted = true;
-      break;
   }
 });
 
 
 
-
-
 }
+
+function setupControls() {
+  const canvas = renderer.domElement;
+
+  const pointers = new Map();
+  let lastDistance = 0;
+
+  canvas.style.touchAction = 'none'; // 🔥 prevent browser zoom
+
+  canvas.addEventListener('pointerdown', e => {
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (pointers.size === 1) {
+      isDragging = true;
+      prevMousePos = { x: e.clientX, y: e.clientY };
+    }
+  });
+
+  canvas.addEventListener('pointermove', e => {
+    if (!pointers.has(e.pointerId)) return;
+
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    // 👉 ONE FINGER DRAG
+    if (pointers.size === 1 && isDragging) {
+      const dx = e.clientX - prevMousePos.x;
+      const dy = e.clientY - prevMousePos.y;
+
+      prevMousePos = { x: e.clientX, y: e.clientY };
+
+      const panSpeed = 2.3;
+      camera.position.x -= dx * panSpeed / camera.zoom;
+      camera.position.y += dy * panSpeed / camera.zoom;
+    }
+
+    // 👉 TWO FINGER PINCH ZOOM
+    if (pointers.size === 2) {
+      const pts = Array.from(pointers.values());
+
+      const dx = pts[0].x - pts[1].x;
+      const dy = pts[0].y - pts[1].y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (lastDistance !== 0) {
+        const zoomFactor = distance / lastDistance;
+
+        camera.zoom *= zoomFactor;
+        camera.zoom = THREE.MathUtils.clamp(camera.zoom, 0.1, 10);
+        camera.updateProjectionMatrix();
+      }
+
+      lastDistance = distance;
+    }
+
+    userInteracted = true;
+  });
+
+  function endPointer(e) {
+    pointers.delete(e.pointerId);
+    isDragging = false;
+    lastDistance = 0;
+  }
+
+  canvas.addEventListener('pointerup', endPointer);
+  canvas.addEventListener('pointercancel', endPointer);
+  canvas.addEventListener('pointerleave', endPointer);
+
+  // 👉 MOUSE WHEEL ZOOM (desktop)
+  canvas.addEventListener('wheel', e => {
+    e.preventDefault();
+
+    const factor = 1.05;
+    camera.zoom *= (e.deltaY < 0 ? factor : 1 / factor);
+    camera.zoom = THREE.MathUtils.clamp(camera.zoom, 0.1, 10);
+    camera.updateProjectionMatrix();
+
+    userInteracted = true;
+  });
+
+  // 👉 KEYBOARD CONTROLS
+  window.addEventListener('keydown', e => {
+    const moveAmount = 23;
+    const zoomFactor = 1.05;
+
+    switch (e.key) {
+      case '0':
+        camera.zoom = 1;
+        camera.updateProjectionMatrix();
+        break;
+
+      case '+':
+      case '=':
+        camera.zoom *= zoomFactor;
+        camera.zoom = THREE.MathUtils.clamp(camera.zoom, 0.1, 10);
+        camera.updateProjectionMatrix();
+        break;
+
+      case '-':
+        camera.zoom /= zoomFactor;
+        camera.zoom = THREE.MathUtils.clamp(camera.zoom, 0.1, 10);
+        camera.updateProjectionMatrix();
+        break;
+
+      case 'ArrowUp':
+        camera.position.y += moveAmount;
+        break;
+
+      case 'ArrowDown':
+        camera.position.y -= moveAmount;
+        break;
+
+      case 'ArrowLeft':
+        camera.position.x -= moveAmount;
+        break;
+
+      case 'ArrowRight':
+        camera.position.x += moveAmount;
+        break;
+    }
+
+    userInteracted = true;
+  });
+}
+
+
+
+
+
+
 
 function logProgress() {
   const now = Date.now();
@@ -745,32 +855,42 @@ Object.values(objects).forEach(group => {
 
 if (followObject) {
   const data = followObject.userData;
+  const hasDuration = !!data.rotation_cycle_duration;
+
   const durationMs = (data.rotation_cycle_duration || 0) * cycleData.cycle_duration_ms;
-  const durationFormatted = data.rotation_cycle_duration ? `${data.rotation_cycle_duration} (${formatDuration(durationMs)} / 360°)` : 'N/A';
+  const durationFormatted = hasDuration
+    ? `${data.rotation_cycle_duration} (${formatDuration(durationMs)} / 360°)`
+    : 'N/A';
 
+  let progressSection = '';
 
+  if (hasDuration) {
+    const angle =
+      (globalTime / data.rotation_cycle_duration) * 2 * Math.PI +
+      (data._orbitParams?.angleOffset || 0);
 
-		const angle = (globalTime / (data.rotation_cycle_duration || 60)) * 2 * Math.PI + (data._orbitParams?.angleOffset || 0);
-		
-	const progress = ((angle % (2 * Math.PI)) / (2 * Math.PI)) * 100;
-const progressText = `${progress.toFixed(3)}%`;
+    const progress = ((angle % (2 * Math.PI)) / (2 * Math.PI)) * 100;
+    const progressText = `${progress.toFixed(3)}%`;
 
-  // Update infoBox live position
+    progressSection = `
+      Progress: ${progressText}<br>
+      <div style="background:#555; height:8px; width:100%; border-radius:4px; overflow:hidden; margin:4px 0;">
+        <div style="background:#92E7CB; height:100%; width:${progress.toFixed(1)}%;"></div>
+      </div>
+    `;
+  }
+
   infoBox.innerHTML = `
-  <div style="white-space: normal; overflow: hidden; text-overflow: clip; font-size: 14px; line-height: 1.3;">
-    <strong>${data.display_name || data.id}</strong><br>
-    Rotation:<br>${durationFormatted}<br>
-    Progress: ${progressText}<br>
-    <div style="background:#555; height:8px; width:100%; border-radius:4px; overflow:hidden; margin:4px 0;">
-      <div style="background:#92E7CB; height:100%; width:${progress.toFixed(1)}%;"></div>
+    <div style="white-space: normal; overflow: hidden; text-overflow: clip; font-size: 14px; line-height: 1.3;">
+      <strong>${data.display_name || data.id}</strong><br>
+      Rotation:<br>${durationFormatted}<br>
+      ${progressSection}
+      Position:<br>
+      <span>
+        ${vecToStr(followObject.position)}
+      </span>
     </div>
-    Position:<br>
-    <span>
-      ${vecToStr(followObject.position)}
-    </span>
-  </div>
-`;
-
+  `;
 }
   });
   if (followObject && !userInteracted) {
@@ -820,33 +940,29 @@ window.addEventListener('resize', () => {
 });
 
 (() => {
-const width = window.innerWidth;
-const height = window.innerHeight;
   const starsCount = 550;
   let starseed = 2137;
-  let regenerateOnMove = false;
-  let regenerateOnResize = false;
 
-  // Seeded RNG instance
+  // Seeded RNG
+  function mulberry32(a) {
+    return function() {
+      var t = (a += 0x6D2B79F5);
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    }
+  }
+
   let rand = mulberry32(starseed);
 
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
-  canvas.width = width;
-  canvas.height = height;
 
-  function drawStars() {
+  function drawStars(width, height) {
     ctx.clearRect(0, 0, width, height);
 
     // Radial gradient background
-    const gradient = ctx.createRadialGradient(
-      width / 2,
-      height / 2,
-      0,
-      width / 2,
-      height / 2,
-      width / 1.5
-    );
+    const gradient = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, width/1.5);
     gradient.addColorStop(0, '#00111f');
     gradient.addColorStop(1, '#000000');
     ctx.fillStyle = gradient;
@@ -862,63 +978,57 @@ const height = window.innerHeight;
       starGradient.addColorStop(0, 'rgba(255,255,255,1)');
       starGradient.addColorStop(1, 'rgba(255,255,255,0)');
       ctx.fillStyle = starGradient;
-
       ctx.beginPath();
-      ctx.arc(x, y, glowRadius, 0, Math.PI * 2);
+      ctx.arc(x, y, glowRadius, 0, Math.PI*2);
       ctx.fill();
 
       ctx.fillStyle = 'white';
       ctx.beginPath();
-      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.arc(x, y, radius, 0, Math.PI*2);
       ctx.fill();
     }
   }
 
   function applyBackground() {
-    drawStars();
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
+
+    drawStars(width, height);
+
     const dataURL = canvas.toDataURL();
     document.body.style.backgroundImage = `url(${dataURL})`;
-document.body.style.backgroundRepeat = 'no-repeat';
-document.body.style.backgroundSize = 'cover'; // fill whole screen, maintain aspect ratio
-document.body.style.backgroundPosition = 'center center';
-document.body.style.backgroundAttachment = 'fixed';
-document.body.style.backgroundColor = '#000'; // fallback
+    document.body.style.backgroundRepeat = 'no-repeat';
+    document.body.style.backgroundSize = 'cover';
+    document.body.style.backgroundPosition = 'center center';
+    document.body.style.backgroundAttachment = 'fixed';
   }
 
-  // Throttle helper
-  function throttle(fn, limit) {
-    let inThrottle;
-    return function() {
-      if (!inThrottle) {
-        fn.apply(this, arguments);
-        inThrottle = true;
-        setTimeout(() => (inThrottle = false), limit);
-      }
+ // applyBackground();
+
+  // Create iframe
+  const iframe = document.createElement('iframe');
+  iframe.id = 'mapIframe';
+  iframe.src = 'https://theredmineword.github.io/map/iframe.html';
+  document.body.appendChild(iframe);
+
+  function sendScreenData() {
+    const screenData = {
+      width: window.innerWidth,
+      height: window.innerHeight
     };
+    localStorage.setItem('screenWidth', screenData.width);
+    localStorage.setItem('screenHeight', screenData.height);
+    iframe.contentWindow.postMessage({ type: 'screenData', data: screenData }, '*');
   }
 
-  applyBackground();
+  iframe.onload = sendScreenData;
 
-  if (regenerateOnMove) {
-    window.addEventListener(
-      'mousemove',
-      throttle(() => {
-        // Optionally update seed or just redraw with same seed for now
-        rand = mulberry32(starseed);
-        applyBackground();
-      }, 200)
-    );
-  }
-
-  if (regenerateOnResize) {
-    window.addEventListener(
-      'resize',
-      throttle(() => {
-        rand = mulberry32(starseed);
-        applyBackground();
-      }, 500)
-    );
-  }
+  window.addEventListener('resize', () => {
+    applyBackground();
+    sendScreenData();
+  });
 })();
 
 

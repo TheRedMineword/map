@@ -1,0 +1,22 @@
+{
+  "small_text": {
+    "text": "BETA  /  UPDATE"
+  },
+  "images": {
+    "logo": "https://theredmineword.github.io/favicon.ico",
+    "banner": "https://theredmineword.github.io/map/api/src/banners/numbers.png"
+  },
+  "box": {
+    "lines_outline_hex": "#5DFC59",
+    "title": "Map Was Patched!",
+    "text": "Attempt was made on fixing the:\n- Mobile ui drag and move\n- Bacround not having the resize watcher\n\nI hope this will resolve issues\n~DrMineword"
+  },
+  "button": {
+    "name": "CONTINUE"
+  },
+  "id": "",
+  "load": {
+    "text": "<l>INCOMING UPDATES</l>",
+    "duration_ms": "3700"
+  }
+}

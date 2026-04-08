@@ -5,36 +5,56 @@
 
   try {
     // ===== STEP 1: FETCH ID =====
-    const idUrl = `${base}/bigalert?jam=${Math.random()}`;
-    console.log("[Briefing] Fetching ID from:", idUrl);
+const idUrl = `${base}/bigalert.txt?jam=${Math.random()}`;
+console.log("[Briefing] Fetching ID from:", idUrl);
 
-    const idRes = await fetch(idUrl);
-    console.log("[Briefing] ID response status:", idRes.status);
+const idRes = await fetch(idUrl);
+console.log("[Briefing] ID response status:", idRes.status);
 
-    const idData = await idRes.json();
-    console.log("[Briefing] ID response data:", idData);
+// Fetch as text, not JSON
+let idText = await idRes.text();
+console.log("[Briefing] Raw ID response text:", idText);
 
-    // FIX: API returns raw ID (e.g. 0)
-    const newId = idData;
-    console.log("[Briefing] Extracted ID:", newId);
+// If response is hex like "302e332e31", decode it to string
+// (optional if your server really returns hex)
+try {
+  idText = idText.replace(/\s+/g, ""); // remove whitespace/newlines
+  // Check if looks like hex
+  if (/^[0-9a-fA-F]+$/.test(idText)) {
+    // Convert hex to string
+    idText = idText.match(/.{1,2}/g).map(h => String.fromCharCode(parseInt(h, 16))).join('');
+    console.log("[Briefing] Decoded hex ID to string:", idText);
+  }
+} catch (e) {
+  console.warn("[Briefing] Error decoding hex ID:", e);
+}
 
-    // FIX: allow 0, only block null/undefined/empty
-    if (newId === undefined || newId === null || newId === "") {
-      console.warn("[Briefing] Invalid ID, stopping.");
-      return;
-    }
+// Use the decoded text as new ID
+const newId = idText;
+console.log("[Briefing] Extracted ID:", newId);
 
-    const shownId = localStorage.getItem("mission_briefing_shown_id");
-    console.log("[Briefing] Stored ID:", shownId);
+// Only block null/undefined/empty
+if (newId === undefined || newId === null || newId === "") {
+  console.warn("[Briefing] Invalid ID, stopping.");
+  return;
+}
 
-    // FIX: compare as strings (avoids 0 vs "0" issues)
-    if (String(newId) === String(shownId)) {
-      console.log("[Briefing] ID already shown, skipping.");
-      return;
-    }
+// Compare with stored ID
+const shownId = localStorage.getItem("mission_briefing_shown_id");
+console.log("[Briefing] Stored ID:", shownId);
+
+// Compare as strings
+if (String(newId) === String(shownId)) {
+  console.log("[Briefing] ID already shown, skipping.");
+  return;
+}
+
+// Store new ID
+localStorage.setItem("mission_briefing_shown_id", String(newId));
+console.log("[Briefing] New ID stored:", newId);
 
     // ===== STEP 2: FETCH FULL BRIEFING =====
-    const briefingUrl = `${base}/big_alerts/${newId}?jam=${Math.random()}`;
+    const briefingUrl = `${base}/big_alerts/${newId}.json?jam=${Math.random()}`;
     console.log("[Briefing] Fetching full briefing from:", briefingUrl);
 
     const briefingRes = await fetch(briefingUrl);
@@ -112,6 +132,9 @@
         border-radius: 5px 0 0 0;
         font-size: 0.85em;
         color: white;
+
+        white-space: pre-wrap; /* preserves spaces & line breaks */
+    word-break: break-word; /* optional, breaks long words */
       }
 
       .briefing-banner {
