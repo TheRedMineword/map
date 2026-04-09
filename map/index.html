@@ -940,8 +940,7 @@ window.addEventListener('resize', () => {
 });
 
 (() => {
-  const starsCount = 550;
-  let starseed = 2137;
+  
 
   // Seeded RNG
   function mulberry32(a) {
@@ -953,59 +952,7 @@ window.addEventListener('resize', () => {
     }
   }
 
-  let rand = mulberry32(starseed);
-
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
-
-  function drawStars(width, height) {
-    ctx.clearRect(0, 0, width, height);
-
-    // Radial gradient background
-    const gradient = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, width/1.5);
-    gradient.addColorStop(0, '#00111f');
-    gradient.addColorStop(1, '#000000');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, width, height);
-
-    for (let i = 0; i < starsCount; i++) {
-      const x = rand() * width;
-      const y = rand() * height;
-      const radius = rand() * 1.2 + 0.2;
-
-      const glowRadius = radius * 4;
-      const starGradient = ctx.createRadialGradient(x, y, 0, x, y, glowRadius);
-      starGradient.addColorStop(0, 'rgba(255,255,255,1)');
-      starGradient.addColorStop(1, 'rgba(255,255,255,0)');
-      ctx.fillStyle = starGradient;
-      ctx.beginPath();
-      ctx.arc(x, y, glowRadius, 0, Math.PI*2);
-      ctx.fill();
-
-      ctx.fillStyle = 'white';
-      ctx.beginPath();
-      ctx.arc(x, y, radius, 0, Math.PI*2);
-      ctx.fill();
-    }
-  }
-
-  function applyBackground() {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    canvas.width = width;
-    canvas.height = height;
-
-    drawStars(width, height);
-
-    const dataURL = canvas.toDataURL();
-    document.body.style.backgroundImage = `url(${dataURL})`;
-    document.body.style.backgroundRepeat = 'no-repeat';
-    document.body.style.backgroundSize = 'cover';
-    document.body.style.backgroundPosition = 'center center';
-    document.body.style.backgroundAttachment = 'fixed';
-  }
-
- // applyBackground();
+  
 
   // Create iframe
   const iframe = document.createElement('iframe');
@@ -1026,7 +973,7 @@ window.addEventListener('resize', () => {
   iframe.onload = sendScreenData;
 
   window.addEventListener('resize', () => {
-    applyBackground();
+ 
     sendScreenData();
   });
 })();
